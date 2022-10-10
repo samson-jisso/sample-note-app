@@ -1,6 +1,5 @@
 package com.example.samnotes.presentation.notes.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -8,11 +7,9 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.samnotes.features_notes.domain.model.Note
-import com.example.samnotes.ui.theme.LightBlue
 
 @Composable
 fun NoteItem(

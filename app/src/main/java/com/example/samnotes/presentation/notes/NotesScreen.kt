@@ -1,6 +1,5 @@
 package com.example.samnotes.presentation.notes
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,11 +8,14 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.samnotes.presentation.notes.components.NoteItem
 import com.example.samnotes.presentation.notes.logic.NotesEvent
@@ -24,11 +26,16 @@ import kotlinx.coroutines.launch
 @Composable
 fun NoteScreen(
     navController: NavController,
-    viewModel: NotesViewModel = hiltViewModel()
+    onRequestPermission: () -> Unit,
+    viewModel: NotesViewModel
 ) {
     val state = viewModel.state.value
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+
+    val showDialogState: Boolean by viewModel.showDialogState.collectAsState()
+
+
 
     Scaffold(
         floatingActionButton = {
@@ -41,6 +48,30 @@ fun NoteScreen(
         },
         scaffoldState = scaffoldState
     ) { padding ->
+        if (showDialogState) {
+
+            AlertDialog(
+                onDismissRequest = {},
+                title = {
+                    Text(
+                        text = "Permission Request",
+                        style = TextStyle(
+                            fontSize = MaterialTheme.typography.h6.fontSize,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                },
+                text = {
+                    Text(text = "Please allow sam's note to receive bluetooth connections so that you can share note's")
+                },
+                confirmButton = {
+                    Button(onClick = onRequestPermission) {
+                        Text(text = "Give Permission")
+                    }
+                }
+            )
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -62,12 +93,11 @@ fun NoteScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                            navController.navigate(
-                                Screen.NoteEditScreen.route +
-                                        "?noteId=${note.id}"
-                            )
-                            }
-                            ,
+                                navController.navigate(
+                                    Screen.NoteEditScreen.route +
+                                            "?noteId=${note.id}"
+                                )
+                            },
                         onDeleteClick = {
                             viewModel.onEvent(NotesEvent.DeleteNote(note))
                             scope.launch {
