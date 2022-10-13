@@ -29,6 +29,7 @@ class NoteEditViewModel @Inject constructor(
 
     private var currentNoteId: Int? = null
 
+
     init {
         savedStateHandle.get<Int>("noteId")?.let { noteId ->
             if (noteId != -1) {

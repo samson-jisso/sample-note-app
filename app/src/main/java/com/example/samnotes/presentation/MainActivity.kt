@@ -1,41 +1,61 @@
 package com.example.samnotes.presentation
 
 import android.Manifest
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.samnotes.R
+import com.example.samnotes.presentation.add_edit_note.CameraView
 import com.example.samnotes.presentation.add_edit_note.NoteEditScreen
 import com.example.samnotes.presentation.notes.NoteScreen
 import com.example.samnotes.presentation.notes.logic.NotesViewModel
 import com.example.samnotes.presentation.util.Screen
 import com.example.samnotes.ui.theme.SamNotesTheme
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionStatus
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.accompanist.permissions.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import java.io.File
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 @AndroidEntryPoint
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalPermissionsApi::class)
 class MainActivity : ComponentActivity() {
+    private lateinit var outputDirectory: File
+    private lateinit var cameraExecutor: ExecutorService
+    private lateinit var photoUri: Uri
+    private var shouldShowPhoto: MutableState<Boolean> = mutableStateOf(false)
+
+    private var shouldShowCamera: MutableState<Boolean> = mutableStateOf(false)
+
+
     private val viewModel: NotesViewModel by viewModels()
     private val permissions = listOf(
         Manifest.permission.BLUETOOTH_CONNECT,
         Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.CAMERA
     )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -43,7 +63,7 @@ class MainActivity : ComponentActivity() {
             val multiplePermissionsState =
                 rememberMultiplePermissionsState(permissions = permissions)
             val result = multiplePermissionsState.permissions.all { permissionState ->
-                    permissionState.status == PermissionStatus.Granted
+                permissionState.status == PermissionStatus.Granted
             }
             if (result) {
                 viewModel.onOpenDialogClicked()
@@ -79,20 +99,67 @@ class MainActivity : ComponentActivity() {
                                 defaultValue = -1
                             })
                         ) {
-                            NoteEditScreen(navController = navController)
+                            NoteEditScreen(
+                                navController = navController,
+                            )
+                        }
+                        composable(
+                            route = Screen.CameraView.route,
+                        ) {
+                            CameraView(
+                                outputDirectory = outputDirectory,
+                                executor =  cameraExecutor ,
+                                onImageCaptured = ::handleImageCapture,
+                                onError = {Log.e("sam", "ViewError", it)}
+                            )
                         }
                     }
                 }
             }
         }
+        outputDirectory = getOutputDirectory()
+        cameraExecutor = Executors.newSingleThreadExecutor()
     }
-}
+
+//    private fun requestCameraPermission() {
+//        when {
+//            ContextCompat.checkSelfPermission(
+//                this,
+//                Manifest.permission.CAMERA
+//            ) == PackageManager.PERMISSION_GRANTED -> {
+//                Log.i("sam", "Permission previously granted")
+//            }
+//
+//            ActivityCompat.shouldShowRequestPermissionRationale(
+//                this,
+//                Manifest.permission.CAMERA
+//            ) ->                 Log.i("sam", "Sam Notes needs camera access so that you can take photos and videos go to settings to enable the permission")
+//            else -> {
+//                  requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+//            }
+//        }
+//    }
+    private fun handleImageCapture(uri: Uri) {
+        Log.i("kilo", "Image captured: $uri")
+        shouldShowCamera.value = false
+
+        photoUri = uri
+        shouldShowPhoto.value = true
+    }
+
+    private fun getOutputDirectory(): File {
+        val mediaDir = externalMediaDirs.firstOrNull()?.let {
+            File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
+        }
+
+        return if (mediaDir != null && mediaDir.exists()) mediaDir else filesDir
+    }
 
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    SamNotesTheme {
 
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraExecutor.shutdown()
     }
 }

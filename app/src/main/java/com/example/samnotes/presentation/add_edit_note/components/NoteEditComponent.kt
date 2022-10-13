@@ -31,7 +31,6 @@ fun NoteEditComponent(
             singleLine = singleLine,
             textStyle = textStyle,
             modifier = Modifier
-                .fillMaxWidth()
                 .onFocusChanged {
                     onFocusChange(it)
                 }
