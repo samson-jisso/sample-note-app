@@ -1,6 +1,8 @@
 package com.example.samnotes.presentation.add_edit_note
 
 import android.Manifest
+import android.app.Activity
+import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -29,6 +31,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.example.samnotes.presentation.MainActivity
 import com.example.samnotes.presentation.add_edit_note.components.NoteEditComponent
 import com.example.samnotes.presentation.add_edit_note.logic.NoteEditEvent
 import com.example.samnotes.presentation.add_edit_note.logic.NoteEditViewModel
@@ -71,9 +74,10 @@ fun NoteEditScreen(
                         duration = SnackbarDuration.Short
                     )
                     if (snackBar == SnackbarResult.ActionPerformed) {
-                        println("hello")
-                        val setting = Intent(Intent(Settings.ACTION_SETTINGS))
-                        context.startActivity(setting)
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.fromParts("package", "com.example.samnotes", null)
+                        }.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        context.startActivity(intent)
                     }
 
                 }

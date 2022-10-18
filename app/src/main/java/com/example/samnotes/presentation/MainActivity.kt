@@ -1,24 +1,18 @@
 package com.example.samnotes.presentation
 
 import android.Manifest
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -33,7 +27,6 @@ import com.example.samnotes.presentation.util.Screen
 import com.example.samnotes.ui.theme.SamNotesTheme
 import com.google.accompanist.permissions.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -108,9 +101,9 @@ class MainActivity : ComponentActivity() {
                         ) {
                             CameraView(
                                 outputDirectory = outputDirectory,
-                                executor =  cameraExecutor ,
+                                executor = cameraExecutor,
                                 onImageCaptured = ::handleImageCapture,
-                                onError = {Log.e("sam", "ViewError", it)}
+                                onError = { Log.e("sam", "ViewError", it) }
                             )
                         }
                     }
@@ -120,46 +113,24 @@ class MainActivity : ComponentActivity() {
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
-
-//    private fun requestCameraPermission() {
-//        when {
-//            ContextCompat.checkSelfPermission(
-//                this,
-//                Manifest.permission.CAMERA
-//            ) == PackageManager.PERMISSION_GRANTED -> {
-//                Log.i("sam", "Permission previously granted")
-//            }
-//
-//            ActivityCompat.shouldShowRequestPermissionRationale(
-//                this,
-//                Manifest.permission.CAMERA
-//            ) ->                 Log.i("sam", "Sam Notes needs camera access so that you can take photos and videos go to settings to enable the permission")
-//            else -> {
-//                  requestPermissionLauncher.launch(Manifest.permission.CAMERA)
-//            }
-//        }
-//    }
     private fun handleImageCapture(uri: Uri) {
-        Log.i("kilo", "Image captured: $uri")
-        shouldShowCamera.value = false
-
+        Log.i("samcj", "Image captured: $uri")
         photoUri = uri
-        shouldShowPhoto.value = true
     }
 
     private fun getOutputDirectory(): File {
         val mediaDir = externalMediaDirs.firstOrNull()?.let {
             File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
         }
-
         return if (mediaDir != null && mediaDir.exists()) mediaDir else filesDir
     }
-
-
 
 
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
+    }
+    companion object {
+        const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
 }
