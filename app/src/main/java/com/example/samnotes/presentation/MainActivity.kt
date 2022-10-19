@@ -37,8 +37,7 @@ import java.util.concurrent.Executors
 class MainActivity : ComponentActivity() {
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var photoUri: Uri
-    private var shouldShowPhoto: MutableState<Boolean> = mutableStateOf(false)
+        private var shouldShowPhoto: MutableState<Boolean> = mutableStateOf(false)
 
     private var shouldShowCamera: MutableState<Boolean> = mutableStateOf(false)
 
@@ -102,7 +101,6 @@ class MainActivity : ComponentActivity() {
                             CameraView(
                                 outputDirectory = outputDirectory,
                                 executor = cameraExecutor,
-                                onImageCaptured = ::handleImageCapture,
                                 onError = { Log.e("sam", "ViewError", it) }
                             )
                         }
@@ -113,10 +111,7 @@ class MainActivity : ComponentActivity() {
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
-    private fun handleImageCapture(uri: Uri) {
-        Log.i("samcj", "Image captured: $uri")
-        photoUri = uri
-    }
+
 
     private fun getOutputDirectory(): File {
         val mediaDir = externalMediaDirs.firstOrNull()?.let {
