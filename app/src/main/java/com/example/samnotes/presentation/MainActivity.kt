@@ -1,25 +1,20 @@
 package com.example.samnotes.presentation
 
 import android.Manifest
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.annotation.RequiresApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.samnotes.R
-import com.example.samnotes.presentation.add_edit_note.CameraView
+import com.example.samnotes.presentation.add_edit_note.camera.CameraView
 import com.example.samnotes.presentation.add_edit_note.NoteEditScreen
 import com.example.samnotes.presentation.notes.NoteScreen
 import com.example.samnotes.presentation.notes.logic.NotesViewModel
@@ -32,15 +27,10 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 @AndroidEntryPoint
-@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalPermissionsApi::class)
 class MainActivity : ComponentActivity() {
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
-        private var shouldShowPhoto: MutableState<Boolean> = mutableStateOf(false)
-
-    private var shouldShowCamera: MutableState<Boolean> = mutableStateOf(false)
-
 
     private val viewModel: NotesViewModel by viewModels()
     private val permissions = listOf(
@@ -83,22 +73,46 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(
-                            route = Screen.NoteEditScreen.route + "?noteId={noteId}",
-                            arguments = listOf(navArgument(
+
+                            route = Screen.NoteEditScreen.route + "?noteId={noteId}&photoUri={photoUri}" ,
+                            arguments = listOf(
+                                navArgument(
                                 name = "noteId"
                             ) {
                                 type = NavType.IntType
                                 defaultValue = -1
-                            })
+                            },
+                                navArgument(
+                                    name = "photoUri"
+                                ){
+                                    type = NavType.StringType
+                                    nullable = true
+                                }
+                            )
                         ) {
+                            val arg = it.arguments?.getInt("noteId")
+                            val photoUri = it.arguments?.getString("photoUri")
                             NoteEditScreen(
+                                photoUri = photoUri,
+                                noteIdValue = arg,
                                 navController = navController,
                             )
                         }
                         composable(
-                            route = Screen.CameraView.route,
+                            route = Screen.CameraView.route + "?noteId={noteId}",
+                            arguments = listOf(
+                                navArgument(
+                                    name = "noteId"
+                                ){
+                                    type = NavType.IntType
+                                    defaultValue = -1
+                                }
+                            )
                         ) {
+                            val arg = it.arguments?.getInt("noteId")
                             CameraView(
+                                noteIdValue = arg,
+                                navController = navController,
                                 outputDirectory = outputDirectory,
                                 executor = cameraExecutor,
                                 onError = { Log.e("sam", "ViewError", it) }
@@ -112,7 +126,6 @@ class MainActivity : ComponentActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
-
     private fun getOutputDirectory(): File {
         val mediaDir = externalMediaDirs.firstOrNull()?.let {
             File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
@@ -124,8 +137,5 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
-    }
-    companion object {
-        const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
 }

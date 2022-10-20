@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Sam Notes</string>
+    <string name="file_format">yyyy-MM-dd-HH-mm-ss-SSS</string>
 </resources>

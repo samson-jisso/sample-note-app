@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -31,6 +32,7 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.example.samnotes.presentation.MainActivity
 import com.example.samnotes.presentation.add_edit_note.components.NoteEditComponent
 import com.example.samnotes.presentation.add_edit_note.logic.NoteEditEvent
@@ -51,20 +53,25 @@ import java.util.concurrent.ExecutorService
 
 @Composable
 fun NoteEditScreen(
+    photoUri: String?,
+    noteIdValue: Int?,
     navController: NavController,
     viewModel: NoteEditViewModel = hiltViewModel(),
 ) {
+    val showInsertedImage: MutableState<Boolean> = remember {
+        mutableStateOf(false)
+    }
     val context = LocalContext.current
     val titleState = viewModel.noteTitle.value
     val contentState = viewModel.noteContent.value
-
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
     val requestCameraPermission =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
                 navController.navigate(
-                    Screen.CameraView.route
+                    Screen.CameraView.route +
+                            "?noteId=${noteIdValue}"
                 )
             } else {
                 coroutineScope.launch {
@@ -98,6 +105,12 @@ fun NoteEditScreen(
                     navController.navigateUp()
                 }
             }
+        }
+    }
+
+    LaunchedEffect(key1 = true) {
+        if (photoUri !== null) {
+            showInsertedImage.value = true
         }
     }
     Scaffold(
@@ -146,9 +159,17 @@ fun NoteEditScreen(
                     )
                 }
             }
-
             Spacer(modifier = Modifier.height(16.dp))
-
+            if (showInsertedImage.value) {
+                Image(
+                    painter = rememberImagePainter(data = photoUri),
+                    contentDescription = "captured image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp),
+                    contentScale = ContentScale.FillWidth
+                )
+            }
             NoteEditComponent(
                 text = contentState.text,
                 hint = contentState.hint,

@@ -40,7 +40,7 @@ fun NoteScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(Screen.NoteEditScreen.route) },
+                 onClick = { navController.navigate(Screen.NoteEditScreen.route) },
                 backgroundColor = Color.Gray
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add note")
@@ -95,7 +95,7 @@ fun NoteScreen(
                             .clickable {
                                 navController.navigate(
                                     Screen.NoteEditScreen.route +
-                                            "?noteId=${note.id}"
+                                            "?noteId=${note.id}&photoUri={photoUri}"
                                 )
                             },
                         onDeleteClick = {
