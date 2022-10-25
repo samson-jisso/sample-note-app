@@ -20,25 +20,29 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.rememberImagePainter
 import com.example.samnotes.presentation.add_edit_note.components.NoteEditComponent
 import com.example.samnotes.presentation.add_edit_note.logic.NoteEditEvent
+import com.example.samnotes.presentation.add_edit_note.logic.NoteEditState
 import com.example.samnotes.presentation.add_edit_note.logic.NoteEditViewModel
 import com.example.samnotes.presentation.util.Screen
 import com.example.samnotes.ui.theme.LightBlue
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+var photoUri: String? = null
+
 
 @Composable
 fun NoteEditScreen(
+    arg: String?,
     navController: NavController,
     viewModel: NoteEditViewModel = hiltViewModel(),
 ) {
+
     val context = LocalContext.current
     val titleState = viewModel.noteTitle.value
     val contentState = viewModel.noteContent.value
-
-
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
     val requestCameraPermission =
@@ -66,7 +70,6 @@ fun NoteEditScreen(
             }
         }
 
-
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
@@ -84,7 +87,9 @@ fun NoteEditScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { viewModel.onEvent(NoteEditEvent.SaveNote) },
+                onClick = {
+                    viewModel.onEvent(NoteEditEvent.SaveNote)
+                },
                 backgroundColor = MaterialTheme.colors.primary
             ) {
                 Icon(imageVector = Icons.Default.Save, contentDescription = "Save Note")
@@ -126,6 +131,27 @@ fun NoteEditScreen(
                             }
                     )
                 }
+            }
+            if (arg !== null || viewModel.photoUri.value.photoUri.isNotBlank()) {
+
+                arg?.let {
+                    viewModel.photoUri.value = NoteEditState(
+                        photoUri = arg
+                    )
+                    photoUri = it
+                }
+                LaunchedEffect(key1 = true) {
+                    photoUri = viewModel.photoUri.value.photoUri
+                }
+                println(photoUri)
+
+                Image(
+                    painter = rememberImagePainter(data = photoUri),
+                    contentDescription = "image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
