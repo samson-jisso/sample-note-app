@@ -2,11 +2,15 @@ package com.example.samnotes.presentation.add_edit_note.camera.components
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
@@ -16,73 +20,71 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.samnotes.presentation.add_edit_note.camera.CameraViewModel
+import com.example.samnotes.presentation.add_edit_note.logic.NoteEditViewModel
 import com.example.samnotes.presentation.util.Screen
 
 @Composable
 fun PicturePreview(
     viewModel: CameraViewModel,
-    navController: NavController
+    navController: NavController,
+    noteEditViewModel: NoteEditViewModel = hiltViewModel()
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-
-        ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Spacer(modifier = Modifier.padding(16.dp))
         Image(
             painter = rememberImagePainter(data = viewModel.photoUri),
             contentDescription = "captured image",
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxHeight(0.85f)
+                .fillMaxWidth(),
             contentScale = ContentScale.FillHeight
         )
         Row(
-            verticalAlignment = Alignment.Bottom,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.2f, false),
+            horizontalArrangement = Arrangement.Center
         ) {
-            IconButton(
+            Text(
                 modifier = Modifier
-                    .padding(20.dp)
-                    .weight(1f),
-                onClick = {
-                    Log.i("samcj", "imageSaved uri: ${viewModel.photoUri}")
-                    viewModel.showPhoto.value = false
-                    viewModel.showCamera.value = true
-                },
-                content = {
-                    Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = "check",
-                        modifier = Modifier
-                            .size(70.dp)
-                            .padding(1.dp)
-                            .border(1.dp, Color.Black, CircleShape),
-                        tint = Color.Red
-                    )
-                }
+                    .padding(16.dp)
+                    .clickable {
+                        Log.i("samcj", "imageSaved uri: ${viewModel.photoUri}")
+                        viewModel.showPhoto.value = false
+                        viewModel.showCamera.value = true
+                    },
+                color = Color.White,
+                text = "retry"
             )
-            IconButton(
+            Text(
                 modifier = Modifier
-                    .padding(20.dp)
-                    .weight(1f),
-                onClick = {
-                          navController.navigate(
-                              Screen.NoteEditScreen.route +
-                                      "?photoUri=${viewModel.photoUri}"
-                          )
-                },
-                content = {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "arrow circle right",
-                        modifier = Modifier
-                            .size(70.dp)
-                            .padding(1.dp)
-                            .border(1.dp, Color.Black, CircleShape),
-                        tint = Color.White
-                    )
-                }
+                    .padding(16.dp)
+                    .clickable {
+//                    navController.navigate(
+//                        Screen.NoteEditScreen.route +
+//                                "?photoUri=${viewModel.photoUri}"
+//                    ){
+//                        popUpTo(Screen.CameraView.route) {inclusive = true}
+//                    }
+                        noteEditViewModel.imageUri(viewModel.photoUri)
+                        println("in pictureView model : ${noteEditViewModel.imageUri.value}")
+                        navController.navigateUp()
+                    },
+                color = Color.White,
+                text = "save"
             )
         }
     }
+
+
+//    }
 }

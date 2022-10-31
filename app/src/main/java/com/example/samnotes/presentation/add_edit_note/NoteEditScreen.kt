@@ -39,7 +39,6 @@ fun NoteEditScreen(
     navController: NavController,
     viewModel: NoteEditViewModel = hiltViewModel(),
 ) {
-
     val context = LocalContext.current
     val titleState = viewModel.noteTitle.value
     val contentState = viewModel.noteContent.value
@@ -50,7 +49,9 @@ fun NoteEditScreen(
             if (isGranted) {
                 navController.navigate(
                     Screen.CameraView.route
-                )
+                ){
+                    popUpTo(Screen.NoteEditScreen.route)
+                }
             } else {
                 coroutineScope.launch {
                     val snackBar = scaffoldState.snackbarHostState.showSnackbar(
@@ -132,8 +133,9 @@ fun NoteEditScreen(
                     )
                 }
             }
+            println(viewModel.imageUri.value)
             if (arg !== null || viewModel.photoUri.value.photoUri.isNotBlank()) {
-
+                println(viewModel.imageUri)
                 arg?.let {
                     viewModel.photoUri.value = NoteEditState(
                         photoUri = arg
@@ -143,8 +145,6 @@ fun NoteEditScreen(
                 LaunchedEffect(key1 = true) {
                     photoUri = viewModel.photoUri.value.photoUri
                 }
-                println(photoUri)
-
                 Image(
                     painter = rememberImagePainter(data = photoUri),
                     contentDescription = "image",

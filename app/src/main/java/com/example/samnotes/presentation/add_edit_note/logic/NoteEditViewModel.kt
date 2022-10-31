@@ -15,11 +15,15 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 @HiltViewModel
 class NoteEditViewModel @Inject constructor(
     private val noteUseCases: NoteUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+    private var _imageUri: MutableState<Uri?> = mutableStateOf(null)
+    val imageUri:State<Uri?> = _imageUri
+
     private val _noteTitle = mutableStateOf(NoteEditState(hint = "Enter Title"))
     val noteTitle: State<NoteEditState> = _noteTitle
 
@@ -30,7 +34,6 @@ class NoteEditViewModel @Inject constructor(
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
-
 
 
     private var currentNoteId: Int? = null
@@ -58,11 +61,15 @@ class NoteEditViewModel @Inject constructor(
         }
     }
 
+    fun imageUri(imageData: Uri?) {
+        _imageUri.value = imageData
+    }
+
     fun onEvent(event: NoteEditEvent) {
-        when(event) {
+        when (event) {
             is NoteEditEvent.EnteredTitle -> {
                 _noteTitle.value = noteTitle.value.copy(
-                    text =  event.value
+                    text = event.value
                 )
             }
             is NoteEditEvent.ChangedTitleFocus -> {
@@ -73,7 +80,7 @@ class NoteEditViewModel @Inject constructor(
             }
             is NoteEditEvent.EnteredContent -> {
                 _noteContent.value = noteContent.value.copy(
-                    text =  event.value
+                    text = event.value
                 )
             }
             is NoteEditEvent.ChangedContentFocus -> {
@@ -93,7 +100,7 @@ class NoteEditViewModel @Inject constructor(
                             )
                         )
                         _eventFlow.emit(UiEvent.SaveNote)
-                    }catch (e:InvalidNoteException) {
+                    } catch (e: InvalidNoteException) {
                         _eventFlow.emit(
                             UiEvent.ShowSnackBar(
                                 message = e.message ?: "couldn't save"

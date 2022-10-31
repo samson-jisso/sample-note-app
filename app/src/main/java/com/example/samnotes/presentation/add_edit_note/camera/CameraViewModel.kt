@@ -27,6 +27,7 @@ class CameraViewModel @Inject constructor()
         executor: Executor,
         onError: (ImageCaptureException) -> Unit
     ) {
+        val captureImage = imageCapture ?: return
         val photoFile = File(
             outputDirectory,
             SimpleDateFormat(
@@ -37,7 +38,7 @@ class CameraViewModel @Inject constructor()
 
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-        imageCapture!!.takePicture(outputOptions, executor, object : ImageCapture.OnImageSavedCallback {
+        captureImage.takePicture(outputOptions, executor, object : ImageCapture.OnImageSavedCallback {
             override fun onError(exception: ImageCaptureException) {
                 Log.e("samcj", "Take photo error:", exception)
                 onError(exception)

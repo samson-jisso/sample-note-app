@@ -23,6 +23,7 @@ fun CameraView(
     // 1
     if (viewModel.showCamera.value) {
         CameraLauncher(
+            navController,
             outputDirectory,
             executor,
             onError,
