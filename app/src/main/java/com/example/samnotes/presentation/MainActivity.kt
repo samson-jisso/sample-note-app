@@ -4,13 +4,10 @@ import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.navigation.compose.rememberNavController
-import com.example.samnotes.Navigation
 import com.example.samnotes.R
-import com.example.samnotes.presentation.notes.logic.NotesViewModel
 import com.example.samnotes.ui.theme.SamNotesTheme
 import com.google.accompanist.permissions.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,7 +22,6 @@ class MainActivity : ComponentActivity() {
     private lateinit var cameraExecutor: ExecutorService
 
 
-    private val viewModel: NotesViewModel by viewModels()
     private val permissions = listOf(
         Manifest.permission.BLUETOOTH_CONNECT,
         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -41,23 +37,14 @@ class MainActivity : ComponentActivity() {
             val result = multiplePermissionsState.permissions.all { permissionState ->
                 permissionState.status == PermissionStatus.Granted
             }
-            if (result) {
-                viewModel.onOpenDialogClicked()
-                viewModel.ClosePermissionDialog()
-            }
+
             SamNotesTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     color = MaterialTheme.colors.primary
                 ) {
                     val navHostController = rememberNavController()
-                    Navigation(
-                        outputDirectory = outputDirectory,
-                        navController = navHostController,
-                        cameraExecutor = cameraExecutor ,
-                        multiplePermissionsState = multiplePermissionsState,
-                        viewModel = viewModel
-                    )
+
                 }
             }
         }
