@@ -6,8 +6,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.samnotes.R
+import com.example.samnotes.presentation.navigation.Navigation
 import com.example.samnotes.ui.theme.SamNotesTheme
 import com.google.accompanist.permissions.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,8 +45,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     color = MaterialTheme.colors.primary
                 ) {
-                    val navHostController = rememberNavController()
-
+                    Navigation()
                 }
             }
         }
