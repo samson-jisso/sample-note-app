@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,16 +13,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.samnotes.features.data.local.entity.NoteEvent
+import com.example.samnotes.presentation.note_screen.NoteScreenViewModel
+import com.example.samnotes.presentation.note_screen.NoteState
 
 @Composable
-fun NoteEditScreen() {
+fun NoteEditScreen(
+    viewModel: NoteScreenViewModel  = hiltViewModel()
+) {
     val padding = 8.dp
-    var title by remember {
-        mutableStateOf(TextFieldValue(""))
-    }
+    val state= viewModel.state
+    //update live data collect as state library
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -60,9 +62,9 @@ fun NoteEditScreen() {
         )
 
         BasicTextField(
-            value = title,
+            value = state.value?.title ?: "",
             onValueChange = {
-                title = it
+                viewModel.handleNoteEvent(noteEvent = NoteEvent.UpdateNoteTitle(it))
             },
 
             modifier = Modifier
