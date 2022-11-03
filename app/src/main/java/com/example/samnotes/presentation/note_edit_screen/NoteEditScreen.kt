@@ -7,7 +7,6 @@ import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -17,12 +16,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.samnotes.features.data.local.entity.NoteEvent
-import com.example.samnotes.presentation.note_screen.NoteScreenViewModel
-import com.example.samnotes.presentation.note_screen.NoteState
 
 @Composable
 fun NoteEditScreen(
-    viewModel: NoteScreenViewModel  = hiltViewModel()
+    viewModel: NoteScreenViewModel = hiltViewModel()
 ) {
     val padding = 8.dp
     val state= viewModel.state
@@ -60,10 +57,11 @@ fun NoteEditScreen(
                 }
             }
         )
-
+println(state.value?.title)
         BasicTextField(
             value = state.value?.title ?: "",
             onValueChange = {
+                println("onvalue change: $it")
                 viewModel.handleNoteEvent(noteEvent = NoteEvent.UpdateNoteTitle(it))
             },
 
