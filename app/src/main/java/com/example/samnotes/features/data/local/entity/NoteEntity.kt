@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class NoteEntity(
- @PrimaryKey
+ @PrimaryKey(autoGenerate = false)
  val id: Int? = null,
  val title:String? = null,
  val content: String? = null,

@@ -6,6 +6,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
@@ -15,80 +16,44 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.samnotes.features.data.local.entity.NoteEvent
+import com.example.samnotes.presentation.note_edit_screen.component.NoteTextHolderComponent
+import com.example.samnotes.presentation.note_edit_screen.component.TopBar
 
 @Composable
 fun NoteEditScreen(
     viewModel: NoteScreenViewModel = hiltViewModel()
 ) {
     val padding = 8.dp
-    val state= viewModel.state
+//    val state= viewModel.state.observeAsState()
     //update live data collect as state library
+    val state = viewModel.state.value
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        Box(
-            modifier = Modifier
-                .padding(8.dp),
-            content = {
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Card(
-                       modifier = Modifier
-                           .padding(padding)
-                    ) {
-                        Text(text = "back")
-                    }
-                }
-                Row(
-                    horizontalArrangement = Arrangement.End,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Card(
-                        modifier = Modifier
-                            .padding(padding)
-                    ) {
-                        Text(text = "search")
-                    }
-                }
-            }
+        TopBar(modifier = Modifier
+            .padding(padding)
+            .fillMaxWidth()
         )
-println(state.value?.title)
-        BasicTextField(
-            value = state.value?.title ?: "",
-            onValueChange = {
-                println("onvalue change: $it")
-                viewModel.handleNoteEvent(noteEvent = NoteEvent.UpdateNoteTitle(it))
-            },
 
+        NoteTextHolderComponent(text = state.title,
+            onValueChange = {
+            viewModel.handleNoteEvent(NoteEvent.UpdateNoteTitle(it))
+        },
             modifier = Modifier
                 .padding(padding)
                 .wrapContentHeight()
-                .background(Color.White),
-            decorationBox = {
-                innerTextField ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(horizontal = 10.dp, vertical = 10.dp),
-                    contentAlignment = Alignment.CenterStart
-                ) {
-                    innerTextField()
-                }
-            },
-            cursorBrush = SolidColor(Color.Black),
-            textStyle = TextStyle(
-                color = Color.Black,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
+                .fillMaxWidth()
         )
 
 
+        NoteTextHolderComponent(text = state.content,
+            onValueChange = {
+                viewModel.handleNoteEvent(NoteEvent.UpdateNoteContent(it))
+            },
+        modifier = Modifier
+            .padding(top = 0.dp, bottom = padding, start = padding, end = padding)
+            .wrapContentHeight()
+            .fillMaxWidth()
+            )
     }
 }

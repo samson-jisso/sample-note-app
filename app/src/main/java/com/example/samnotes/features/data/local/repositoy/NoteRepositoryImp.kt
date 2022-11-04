@@ -12,7 +12,7 @@ class NoteRepositoryImp(
       return noteDao.getNotes()
     }
 
-    override suspend fun insertNote(note: NoteEntity) {
+    override suspend fun insertNote(note: NoteEntity):Long {
        return noteDao.insertNote(note)
     }
 
@@ -22,5 +22,13 @@ class NoteRepositoryImp(
 
     override suspend fun getSingleNote(noteId: Int):List<NoteEntity> {
         return noteDao.getSingleNote(noteId)
+    }
+
+    override suspend fun updateNote(note: NoteEntity) {
+        return noteDao.updateNote(note)
+    }
+
+    override suspend fun getIdFromRowId(rowId: Long): Int {
+        return noteDao.getIdFromRow(rowId)
     }
 }

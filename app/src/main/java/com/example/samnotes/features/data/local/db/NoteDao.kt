@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.samnotes.features.data.local.entity.NoteEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -20,5 +21,11 @@ interface NoteDao {
     suspend fun deleteNote(note: NoteEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertNote(note: NoteEntity)
+    suspend fun insertNote(note: NoteEntity):Long
+
+    @Update
+    suspend fun updateNote(note:NoteEntity)
+
+    @Query("SELECT id from noteentity WHERE :rowId")
+    suspend fun getIdFromRow(rowId: Long):Int
 }

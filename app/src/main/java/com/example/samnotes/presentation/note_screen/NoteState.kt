@@ -1,10 +1,7 @@
 package com.example.samnotes.presentation.note_screen
 
-import java.net.IDN
+data class NoteData(
+    val title: String,
+    val content: String
+)
 
-sealed class NoteState {
-    data class NoteData(
-        val title: String,
-        val content: String
-    ) : NoteState()
-}
