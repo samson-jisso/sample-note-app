@@ -9,7 +9,7 @@ interface NoteRepository {
     fun getNotes():Flow<List<NoteEntity>>
     suspend fun insertNote(note: NoteEntity):Long
     suspend fun deleteNote(note:NoteEntity)
-    suspend fun getSingleNote(noteId: Int):List<NoteEntity>
+    fun getSingleNote(noteId: Int):Flow<NoteEntity>
     suspend fun updateNote(note: NoteEntity)
     suspend fun getIdFromRowId(rowId: Long):Int
 }

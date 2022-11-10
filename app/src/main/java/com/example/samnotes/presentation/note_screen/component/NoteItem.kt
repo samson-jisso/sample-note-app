@@ -1,7 +1,6 @@
 package com.example.samnotes.presentation.note_screen.component
 
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -16,20 +15,33 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun NoteItem(
     modifier: Modifier,
+    title: String?,
+    content: String?
 ) {
-    Card(
-        backgroundColor = Color.Red,
-        modifier = Modifier
-            .padding(4.dp),
-        elevation = 8.dp,
-    ) {
-        Text(
-            text = "hello",
-            fontWeight = FontWeight.Bold,
-            fontSize = 30.sp,
-            color = Color.White,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(16.dp)
-        )
-    }
+
+        Column(
+
+        ) {
+            Card(
+                backgroundColor = MaterialTheme.colors.onBackground,
+                modifier = modifier,
+                elevation = 8.dp,
+            ) {
+            Text(
+                text = content ?: "no content",
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp,
+                color = MaterialTheme.colors.primary,
+                textAlign = TextAlign.Justify,
+            )
+            }
+            Text(
+                text = title ?: "untitled",
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp,
+                color = MaterialTheme.colors.primary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(2.dp)
+            )
+        }
 }

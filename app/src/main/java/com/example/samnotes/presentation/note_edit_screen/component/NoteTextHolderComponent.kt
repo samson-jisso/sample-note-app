@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,9 +41,9 @@ fun NoteTextHolderComponent(
                 innerTextField()
             }
         },
-        cursorBrush = SolidColor(Color.Black),
+        cursorBrush = SolidColor(MaterialTheme.colors.primary),
         textStyle = TextStyle(
-            color = Color.Black,
+            color = MaterialTheme.colors.primary,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold
         )
