@@ -20,9 +20,6 @@ constructor(
     private var _state = MutableLiveData<NoteEditScreenState>()
     val state: LiveData<NoteEditScreenState> = _state
 
-    private var _clicked = mutableStateOf(false)
-    val clicked:State<Boolean> = _clicked
-
     private var noteId: Int? = savedStateHandle.get<Int>("noteId")
 
     private var insertTitleState: Long? = null
@@ -30,14 +27,8 @@ constructor(
     init {
         if (noteId == -1) {
             // you create a n note id
-            val randomId = randomIdNum()
-            val noteState = NoteEditScreenState( 0,"Enter Title", "Enter content")
+            val noteState = NoteEditScreenState(0, "Enter Title", "Enter content")
             _state.value = noteState
-            // since there is no note we must create one in the database
-            insertNote(
-                id = randomId, title = noteState.title, content = noteState.content
-            )
-            noteId = randomId
         } else {
             //get from db
             viewModelScope.launch {
@@ -60,30 +51,52 @@ constructor(
                 _state.value = state.value?.copy(
                     title = noteEvent.titleEntered
                 )
-                noteUseCases.updateNote(
-                    NoteEntity(
-                        id = noteId,
-                        title = state.value?.title,
-                        content = state.value?.content
+                if (
+                    noteId == -1
+                    && state.value!!.title.isNotBlank()
+                    && state.value!!.content.isNotBlank()
+                ) {
+                    val randomId = randomIdNum()
+                    insertNote(randomId, title = state.value?.title, content = state.value?.content)
+                    noteId = randomId
+                } else {
+                    noteUseCases.updateNote(
+                        NoteEntity(
+                            id = noteId,
+                            title = state.value?.title,
+                            content = state.value?.content
+                        )
                     )
-                )
+                }
             }
             is NoteEvent.UpdateNoteContent -> {
                 _state.value = state.value?.copy(
                     content = noteEvent.contentEntered
                 )
-                noteUseCases.updateNote(
-                    NoteEntity(
-                        id = noteId,
-                        title = state.value?.title,
-                        content = state.value?.content
+                if (
+                    noteId == -1
+                    && state.value!!.title.isNotBlank()
+                    && state.value!!.content.isNotBlank()
+                ) {
+                    val randomId = randomIdNum()
+                    insertNote(randomId, title = state.value?.title, content = state.value?.content)
+                    noteId = randomId
+                } else {
+                    noteUseCases.updateNote(
+                        NoteEntity(
+                            id = noteId,
+                            title = state.value?.title,
+                            content = state.value?.content
+                        )
                     )
-                )
+                }
             }
+
         }
+
     }
 
-    private fun insertNote(id: Int?, title: String, content: String) = viewModelScope.launch {
+    private fun insertNote(id: Int?, title: String?, content: String?) = viewModelScope.launch {
         val rowId = noteUseCases.insertNote(
             NoteEntity(
                 id = id,
@@ -95,6 +108,6 @@ constructor(
     }
 
     private fun randomIdNum(): Int {
-        return Random.nextInt(100000 , 999999)
+        return Random.nextInt(100000, 999999)
     }
 }

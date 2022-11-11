@@ -21,4 +21,7 @@ class NoteRepositoryImp(
     override suspend fun updateNote(note: NoteEntity) = noteDao.updateNote(note)
 
     override suspend fun getIdFromRowId(rowId: Long): Int = noteDao.getIdFromRow(rowId)
+    override suspend fun deleteSingleNote(noteId: Int) {
+        noteDao.deleteNoteId(noteId)
+    }
 }

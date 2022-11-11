@@ -49,7 +49,7 @@ fun TopBar(
                     content = {
                     Icon(
                         imageVector = Icons.Default.Search,
-                        contentDescription = "back arrow",
+                        contentDescription = "Search",
                         tint = MaterialTheme.colors.primary
                     )
                 })

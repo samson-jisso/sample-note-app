@@ -12,4 +12,5 @@ interface NoteRepository {
     fun getSingleNote(noteId: Int):Flow<NoteEntity>
     suspend fun updateNote(note: NoteEntity)
     suspend fun getIdFromRowId(rowId: Long):Int
+    suspend fun deleteSingleNote(noteId: Int)
 }

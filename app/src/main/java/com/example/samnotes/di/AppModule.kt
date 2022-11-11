@@ -45,7 +45,8 @@ object AppModule {
             getSingleNote = GetSingleNote(repository),
             insertNote = InsertNote(repository),
             updateNote = UpdateNote(repository),
-            getIDFromInserted = GetIDFromInserted(repository)
+            getIDFromInserted = GetIDFromInserted(repository),
+            deleteSingleNote = DeleteSingleNote(repository)
         )
     }
 
