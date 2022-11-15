@@ -1,16 +1,15 @@
 package com.example.samnotes.features.domain.repository
 
-import com.example.samnotes.features.data.local.entity.NoteEntity
+import com.example.samnotes.features.domain.model.Note
 import kotlinx.coroutines.flow.Flow
-import java.sql.RowId
 
 
 interface NoteRepository {
-    fun getNotes():Flow<List<NoteEntity>>
-    suspend fun insertNote(note: NoteEntity):Long
-    suspend fun deleteNote(note:NoteEntity)
-    fun getSingleNote(noteId: Int):Flow<NoteEntity>
-    suspend fun updateNote(note: NoteEntity)
+    suspend fun getNotes():Flow<List<Note>>
+    suspend fun insertNote(note: Note):Long
+    suspend fun deleteNote(note:Note)
+    suspend fun getSingleNote(noteId: Int):Note?
+    suspend fun updateNote(note: Note)
     suspend fun getIdFromRowId(rowId: Long):Int
     suspend fun deleteSingleNote(noteId: Int)
 }

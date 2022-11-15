@@ -1,11 +1,10 @@
 package com.example.samnotes.presentation.note_edit_screen
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.*
-import com.example.samnotes.features.data.local.entity.NoteEntity
+import com.example.samnotes.features.domain.model.Note
 import com.example.samnotes.features.domain.use_case.NoteUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.random.Random
@@ -15,7 +14,7 @@ class NoteEditScreenViewModel
 @Inject
 constructor(
     private val noteUseCases: NoteUseCases,
-    private val savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private var _state = MutableLiveData<NoteEditScreenState>()
     val state: LiveData<NoteEditScreenState> = _state
@@ -31,13 +30,15 @@ constructor(
             _state.value = noteState
         } else {
             //get from db
-            viewModelScope.launch {
-                noteUseCases.getSingleNote(noteId!!).collect {
-                    _state.value = NoteEditScreenState(
-                        id = it.id ?: 0,
-                        title = it.title ?: "",
-                        content = it.content ?: ""
-                    )
+            viewModelScope.launch(Dispatchers.IO) {
+                val noteData = noteUseCases.getSingleNote(noteId!!)
+                this.launch(Dispatchers.Main) {
+
+                _state.value = NoteEditScreenState(
+                    id = noteData?.id,
+                    title = noteData?.title,
+                    content = noteData?.content
+                )
                 }
             }
         }
@@ -53,15 +54,15 @@ constructor(
                 )
                 if (
                     noteId == -1
-                    && state.value!!.title.isNotBlank()
-                    && state.value!!.content.isNotBlank()
+                    && state.value!!.title!!.isNotBlank()
+                    && state.value!!.content!!.isNotBlank()
                 ) {
                     val randomId = randomIdNum()
                     insertNote(randomId, title = state.value?.title, content = state.value?.content)
                     noteId = randomId
                 } else {
                     noteUseCases.updateNote(
-                        NoteEntity(
+                        Note(
                             id = noteId,
                             title = state.value?.title,
                             content = state.value?.content
@@ -75,15 +76,15 @@ constructor(
                 )
                 if (
                     noteId == -1
-                    && state.value!!.title.isNotBlank()
-                    && state.value!!.content.isNotBlank()
+                    && state.value!!.title!!.isNotBlank()
+                    && state.value!!.content!!.isNotBlank()
                 ) {
                     val randomId = randomIdNum()
                     insertNote(randomId, title = state.value?.title, content = state.value?.content)
                     noteId = randomId
                 } else {
                     noteUseCases.updateNote(
-                        NoteEntity(
+                        Note(
                             id = noteId,
                             title = state.value?.title,
                             content = state.value?.content
@@ -98,7 +99,7 @@ constructor(
 
     private fun insertNote(id: Int?, title: String?, content: String?) = viewModelScope.launch {
         val rowId = noteUseCases.insertNote(
-            NoteEntity(
+            Note(
                 id = id,
                 title = title,
                 content = content

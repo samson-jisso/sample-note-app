@@ -33,6 +33,8 @@ fun NoteItem(
                 fontSize = 16.sp,
                 color = MaterialTheme.colors.primary,
                 textAlign = TextAlign.Justify,
+                modifier = Modifier
+                    .padding(18.dp)
             )
             }
             Text(
@@ -40,8 +42,10 @@ fun NoteItem(
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 color = MaterialTheme.colors.primary,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(2.dp)
+                textAlign = TextAlign.Left,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp)
             )
         }
 }

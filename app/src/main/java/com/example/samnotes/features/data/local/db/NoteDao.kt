@@ -1,4 +1,4 @@
-package com.example.samnotes.features.data.local.db
+﻿package com.example.samnotes.features.data.local.db
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface NoteDao {
     @Query("SELECT * FROM noteentity")
-    fun getNotes(): Flow<List<NoteEntity>>
+    fun getNotes(): List<NoteEntity>
 
     @Query("SELECT * FROM noteentity WHERE Id = :noteId")
-    fun getSingleNote(noteId: Int): Flow<NoteEntity>
+    fun getSingleNote(noteId: Int): NoteEntity
 
     @Delete
     suspend fun deleteNote(note: NoteEntity)
