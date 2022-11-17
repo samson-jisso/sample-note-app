@@ -22,26 +22,47 @@ constructor(
     init {
         viewModelScope.launch {
             val notesData = NoteScreenState(
-                data = emptyList()
+                data = emptyList(),
+                selectedNoteId = emptyList(),
             )
             _state.value = notesData
         }
     }
 
     fun noteScreenEvent(event: NoteScreenEvent) {
-        when(event) {
-            is NoteScreenEvent.UpdateSelectedData -> {
-                _state.value?.data = state.value?.data!!.mapIndexed { j, item ->
-                    if (event.index == j) {
-                        item.copy(
-                            isSelected = !item.isSelected
-                        )
-                    }else item
+        when (event) {
+            is NoteScreenEvent.SelectNote -> {
+                if (!state.value?.selectedNoteId?.contains(event.id)!!) {
+                    _state.value = state.value?.copy(
+                        selectedNoteId = state.value!!.selectedNoteId.plus(event.id)
+                    )
                 }
-                println(state.value?.data)
             }
+            is NoteScreenEvent.DeselectNote -> {
+                if (state.value?.selectedNoteId?.contains(event.id)!!) {
+                    _state.value = state.value?.copy(
+                        selectedNoteId = state.value!!.selectedNoteId.minus(event.id)
+                    )
+                }else {
+                    _state.value = state.value?.copy(
+                        selectedNoteId = state.value!!.selectedNoteId.plus(event.id)
+                    )
+                }
+            }
+            is NoteScreenEvent.LongPressClicked -> {
+                _state.value = state.value?.copy(
+                    clicked = event.clickable
+                )
+            }
+            is NoteScreenEvent.BackPressed -> {
+                _state.value = state.value?.copy(
+                    selectedNoteId = emptyList()
+                )
+            }
+
         }
     }
+
     fun getNotes() = viewModelScope.launch(Dispatchers.IO) {
         useCases.getNotes().collect { note ->
             this.launch(Dispatchers.Main) {

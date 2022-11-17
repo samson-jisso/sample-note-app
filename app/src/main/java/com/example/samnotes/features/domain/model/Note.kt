@@ -6,7 +6,6 @@ data class Note(
     val id:Int?,
     val title: String?,
     val content:String?,
-    val isSelected:Boolean = false
 ){
     fun toNoteEntity():NoteEntity {
         return NoteEntity(
