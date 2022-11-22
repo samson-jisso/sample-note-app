@@ -22,8 +22,8 @@ constructor(
     init {
         viewModelScope.launch {
             val notesData = NoteScreenState(
-                data = emptyList(),
-                selectedNoteId = emptyList(),
+                data = arrayListOf(),
+                selectedNoteId = arrayListOf(),
             )
             _state.value = notesData
         }
@@ -33,20 +33,30 @@ constructor(
         when (event) {
             is NoteScreenEvent.SelectNote -> {
                 if (!state.value?.selectedNoteId?.contains(event.id)!!) {
+//                    _state.value!!.selectedNoteId.add(event.id!!)
                     _state.value = state.value?.copy(
-                        selectedNoteId = state.value!!.selectedNoteId.plus(event.id)
+                        selectedNoteId = _state.value!!.selectedNoteId.plus(event.id!!)
                     )
                 }
             }
-            is NoteScreenEvent.DeselectNote -> {
+            is NoteScreenEvent.SelectOrDeselectNote -> {
                 if (state.value?.selectedNoteId?.contains(event.id)!!) {
+//                    _state.value!!.selectedNoteId.remove(event.id!!)
+
+                    println("hello")
+                    println("stateValueFirst:${state.value!!.selectedNoteId}")
+//                    _state.value  = state.value!!.copy(
+//                        selectedNoteId = _state.value!!.selectedNoteId.
+//                    )
                     _state.value = state.value?.copy(
-                        selectedNoteId = state.value!!.selectedNoteId.minus(event.id)
+                        selectedNoteId = _state.value!!.selectedNoteId.minus(event.id!!)
                     )
-                }else {
+                    println(state.value?.selectedNoteId)
+                } else {
                     _state.value = state.value?.copy(
-                        selectedNoteId = state.value!!.selectedNoteId.plus(event.id)
+                        selectedNoteId = _state.value!!.selectedNoteId.plus(event.id!!)
                     )
+                    println(state.value?.selectedNoteId)
                 }
             }
             is NoteScreenEvent.LongPressClicked -> {
@@ -56,8 +66,22 @@ constructor(
             }
             is NoteScreenEvent.BackPressed -> {
                 _state.value = state.value?.copy(
-                    selectedNoteId = emptyList()
+                    selectedNoteId = arrayListOf()
                 )
+            }
+            is NoteScreenEvent.DeleteSelectedNotes -> {
+                println("delete ${state.value?.selectedNoteId}")
+                _state.value?.selectedNoteId?.forEach { selectedNoteId ->
+                    viewModelScope.launch(Dispatchers.IO) {
+                        useCases.deleteSingleNote(selectedNoteId)
+                        getNotes()
+                    }
+//                    _state.value!!.selectedNoteId.remove(selectedNoteId)
+                    _state.value = state.value?.copy(
+                        selectedNoteId = state.value?.selectedNoteId!!.minus(selectedNoteId)
+                    )
+
+                }
             }
 
         }

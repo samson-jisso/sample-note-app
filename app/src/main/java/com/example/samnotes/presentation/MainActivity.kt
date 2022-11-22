@@ -1,15 +1,12 @@
 package com.example.samnotes.presentation
 
-import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import com.example.samnotes.R
-import com.example.samnotes.presentation.navigation.Navigation
+import com.example.samnotes.presentation.navigation.NavigationGraph
 import com.example.samnotes.ui.theme.SamNotesTheme
 import com.google.accompanist.permissions.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,34 +15,34 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 @AndroidEntryPoint
-@OptIn(ExperimentalPermissionsApi::class)
+//@OptIn(ExperimentalPermissionsApi::class)
 class MainActivity : ComponentActivity() {
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
 
 
-    private val permissions = listOf(
-        Manifest.permission.BLUETOOTH_CONNECT,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.READ_EXTERNAL_STORAGE
-    )
+//    private val permissions = listOf(
+//        Manifest.permission.BLUETOOTH_CONNECT,
+//        Manifest.permission.ACCESS_FINE_LOCATION,
+//        Manifest.permission.READ_EXTERNAL_STORAGE
+//    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
 
-            val multiplePermissionsState =
-                rememberMultiplePermissionsState(permissions = permissions)
-            val result = multiplePermissionsState.permissions.all { permissionState ->
-                permissionState.status == PermissionStatus.Granted
-            }
+//            val multiplePermissionsState =
+//                rememberMultiplePermissionsState(permissions = permissions)
+//            val result = multiplePermissionsState.permissions.all { permissionState ->
+//                permissionState.status == PermissionStatus.Granted
+//            }
 
             SamNotesTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     color = MaterialTheme.colors.primary
                 ) {
-                    Navigation()
+                    NavigationGraph()
                 }
             }
         }

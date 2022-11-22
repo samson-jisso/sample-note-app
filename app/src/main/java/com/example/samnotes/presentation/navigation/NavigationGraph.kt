@@ -10,9 +10,7 @@ import com.example.samnotes.presentation.note_edit_screen.NoteEditScreen
 import com.example.samnotes.presentation.note_screen.NotesScreen
 
 @Composable
-fun Navigation(
-
-) {
+fun NavigationGraph() {
     val navHostController = rememberNavController()
     NavHost(navController = navHostController, startDestination = Screen.NotesScreen.route) {
         composable(
