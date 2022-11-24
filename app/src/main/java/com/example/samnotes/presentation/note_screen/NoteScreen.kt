@@ -86,7 +86,8 @@ fun NotesScreen(
                     )
                     Spacer(modifier = Modifier.padding(16.dp))
                 }
-                LazyColumn(
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
                     /* contentPadding = PaddingValues(
                          start = 12.dp, top = 16.dp, end = 12.dp, bottom = 16.dp
                      ),*/ content = {
@@ -95,8 +96,7 @@ fun NotesScreen(
 //                                println(item.id)
                                 Box(
                                     modifier = Modifier
-                                        .padding(end = 4.dp, start = 4.dp, bottom = 8.dp)
-                                        .background(Color.Blue),
+                                        .padding(end = 4.dp, start = 4.dp, bottom = 8.dp),
                                     content = {
                                         NoteItem(
                                             modifier = Modifier

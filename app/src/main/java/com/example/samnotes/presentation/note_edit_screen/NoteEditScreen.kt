@@ -17,12 +17,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.samnotes.presentation.note_edit_screen.component.NoteTextHolderComponent
 import com.example.samnotes.presentation.note_edit_screen.component.TopBar
+import java.io.File
 
 @Composable
 fun NoteEditScreen(
     navHostController: NavHostController,
     viewModel: NoteEditScreenViewModel = hiltViewModel()
 ) {
+
     val context = LocalContext.current
     val padding = 8.dp
     val state = viewModel.state.observeAsState()
