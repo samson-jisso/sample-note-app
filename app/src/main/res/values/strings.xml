@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Sam Notes</string>
+    <string name="file_name">.Sam Notes</string>
 </resources>

@@ -1,8 +1,14 @@
 package com.example.samnotes.presentation.note_edit_screen
 
+import android.net.Uri
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.example.samnotes.features.domain.model.Note
 import com.example.samnotes.features.domain.use_case.NoteUseCases
+import com.example.samnotes.presentation.camera_view.backend.domain.use_cases.CameraUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -14,12 +20,17 @@ class NoteEditScreenViewModel
 @Inject
 constructor(
     private val noteUseCases: NoteUseCases,
+    private val cameraUseCases: CameraUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private var _state = MutableLiveData<NoteEditScreenState>()
     val state: LiveData<NoteEditScreenState> = _state
 
-    private var noteId: Int? = savedStateHandle.get<Int>("noteId")
+    var noteId: Int? = savedStateHandle.get<Int>("noteId")
+    private var _photoUri: MutableState<Uri?> =
+        mutableStateOf(savedStateHandle.get<String>("photoUri")?.toUri())
+    val photoUri: State<Uri?> = _photoUri
+
 
     private var insertTitleState: Long? = null
 
@@ -29,16 +40,20 @@ constructor(
             val noteState = NoteEditScreenState(0, "Enter Title", "Enter content")
             _state.value = noteState
         } else {
+
             //get from db
             viewModelScope.launch(Dispatchers.IO) {
                 val noteData = noteUseCases.getSingleNote(noteId!!)
+                val noteImage = cameraUseCases.getNotePicture(noteId!!)
+                _photoUri.value = noteImage.pictures[0].pictureAddress.toUri()
                 this.launch(Dispatchers.Main) {
-
-                _state.value = NoteEditScreenState(
-                    id = noteData?.id,
-                    title = noteData?.title,
-                    content = noteData?.content
-                )
+                    noteId = noteData?.id
+                    _state.value = NoteEditScreenState(
+                        id = noteData?.id,
+                        title = noteData?.title,
+                        content = noteData?.content,
+                        photoUri = noteImage.pictures[0].pictureAddress.toUri()
+                    )
                 }
             }
         }

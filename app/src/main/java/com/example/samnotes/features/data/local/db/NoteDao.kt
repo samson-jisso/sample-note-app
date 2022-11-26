@@ -14,13 +14,13 @@ interface NoteDao {
     @Query("SELECT * FROM noteentity")
     fun getNotes(): List<NoteEntity>
 
-    @Query("SELECT * FROM noteentity WHERE Id = :noteId")
+    @Query("SELECT * FROM noteentity WHERE noteId = :noteId")
     fun getSingleNote(noteId: Int): NoteEntity
 
     @Delete
     suspend fun deleteNote(note: NoteEntity)
 
-    @Query("DELETE FROM noteentity WHERE Id = :noteId")
+    @Query("DELETE FROM noteentity WHERE noteId = :noteId")
     fun deleteNoteId(noteId: Int)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -29,6 +29,6 @@ interface NoteDao {
     @Update
     suspend fun updateNote(note:NoteEntity)
 
-    @Query("SELECT id from noteentity WHERE :rowId")
+    @Query("SELECT noteId from noteentity WHERE :rowId")
     suspend fun getIdFromRow(rowId: Long):Int
 }

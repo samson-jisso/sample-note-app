@@ -9,7 +9,7 @@ data class Note(
 ){
     fun toNoteEntity():NoteEntity {
         return NoteEntity(
-            id = id,
+            noteId = id,
             title = title,
             content = content
         )

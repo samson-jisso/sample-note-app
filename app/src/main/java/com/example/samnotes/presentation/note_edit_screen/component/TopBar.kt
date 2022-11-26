@@ -1,6 +1,5 @@
 package com.example.samnotes.presentation.note_edit_screen.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -10,13 +9,13 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 
 @Composable
 fun TopBar(
     navHostController: NavHostController,
-    modifier: Modifier, openCamera: () -> Unit
+    modifier: Modifier,
+    onClickCameraIcon: () -> Unit
 ) {
     Box(modifier = modifier
         .fillMaxWidth()
@@ -59,7 +58,7 @@ fun TopBar(
                 modifier = modifier
             ) {
                 IconButton(onClick = {
-                    openCamera()
+                    onClickCameraIcon()
                 }, content = {
                     Icon(
                         imageVector = Icons.Default.AddAPhoto,

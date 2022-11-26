@@ -7,12 +7,12 @@ import com.example.samnotes.features.domain.model.Note
 @Entity
 data class NoteEntity(
     @PrimaryKey(autoGenerate = false)
-    val id: Int? = null,
+    val noteId: Int? = null,
     val title: String? = null,
     val content: String? = null,
 ) {
     fun toNoteDomain(): Note = Note(
-        id = id,
+        id = noteId,
         title = title,
         content = content,
     )
