@@ -17,7 +17,7 @@ import java.util.concurrent.Executors
 
 @Composable
 fun CameraView(
-    navHostController: NavHostController,
+    onNavCameraToNoteEditScreen:(noteId:Int, photoUri:String) -> Unit,
     outPutDirectory: File,
     executor:Executor,
     onError: (ImageCaptureException) -> Unit,
@@ -34,7 +34,7 @@ fun CameraView(
 
     if (viewModel.showPhoto.value) {
         PicturePreview(
-            navHostController = navHostController,
+            onNavCameraToNoteEditScreen,
             viewModel = viewModel
         )
     }

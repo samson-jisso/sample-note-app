@@ -13,7 +13,7 @@ import androidx.navigation.NavHostController
 
 @Composable
 fun TopBar(
-    navHostController: NavHostController,
+    onNavNoteScreen:() -> Unit,
     modifier: Modifier,
     onClickCameraIcon: () -> Unit
 ) {
@@ -26,7 +26,7 @@ fun TopBar(
         ) {
             IconButton(
                 onClick = {
-                    navHostController.navigateUp()
+                   onNavNoteScreen()
                 }) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,

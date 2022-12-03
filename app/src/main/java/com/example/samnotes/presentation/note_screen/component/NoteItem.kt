@@ -1,8 +1,6 @@
 package com.example.samnotes.presentation.note_screen.component
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -14,12 +12,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import com.example.samnotes.presentation.navigation.Screen
 import com.example.samnotes.presentation.note_screen.NoteScreenViewModel
 import com.example.samnotes.ui.theme.Shapes
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NoteItem(
     modifier: Modifier,
@@ -27,7 +22,7 @@ fun NoteItem(
     content: String?,
     viewModel: NoteScreenViewModel,
     id: Int,
-    navHostController: NavHostController,
+    onNavigateToNoteEditScreen: (Int) -> Unit,
     longPress: (Int) -> Unit,
     click: (Int) -> Unit
 ) {
@@ -43,9 +38,7 @@ fun NoteItem(
                     detectTapGestures(
                         onTap = {
                             if (viewModel.state.value?.clicked!!) {
-                                navHostController.navigate(
-                                    Screen.NotesEditScreen.route + "?noteId=${id}"
-                                )
+                                onNavigateToNoteEditScreen(id)
                             } else {
                                 click(id)
                             }
@@ -67,7 +60,7 @@ fun NoteItem(
             )
         }
         Text(
-            text = "$title $id" ?: "untitled",
+            text = "$title",
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
             color = MaterialTheme.colors.primary,

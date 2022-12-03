@@ -4,10 +4,10 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.samnotes.features.data.local.entity.NoteEntity
 import com.example.samnotes.presentation.camera_view.backend.data.db.PictureDao
-import com.example.samnotes.presentation.camera_view.backend.data.db.PicturesEntity
+import com.example.samnotes.presentation.camera_view.backend.data.db.PictureEntity
 
 @Database(
-    entities = [NoteEntity::class, PicturesEntity::class],
+    entities = [NoteEntity::class, PictureEntity::class],
     version = 2,
     exportSchema = false
 )

@@ -3,12 +3,9 @@ package com.example.samnotes.presentation.note_screen
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -28,8 +25,9 @@ import com.example.samnotes.presentation.note_screen.component.SelectItemIcon
 
 @Composable
 fun NotesScreen(
-    navHostController: NavHostController,
-    viewModel: NoteScreenViewModel = hiltViewModel()
+    viewModel: NoteScreenViewModel = hiltViewModel(),
+    onNavigateToNOteEditScreenWithParam:(Int) -> Unit,
+    onNavigateToNoteEditScreenWithoutParam: () -> Unit
 ) {
 
     LaunchedEffect(
@@ -61,7 +59,7 @@ fun NotesScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navHostController.navigate(Screen.NotesEditScreen.route)
+                    onNavigateToNoteEditScreenWithoutParam()
                 }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Note")
             }
@@ -107,7 +105,6 @@ fun NotesScreen(
                                             title = item.title?.take(20),
                                             content = item.content?.take(40),
                                             id = item.id,
-                                            navHostController = navHostController,
                                             viewModel = viewModel,
                                             click = { noteId ->
                                                 println("noteId $noteId")
@@ -127,6 +124,9 @@ fun NotesScreen(
                                                 viewModel.noteScreenEvent(
                                                     NoteScreenEvent.SelectNote(noteId)
                                                 )
+                                            },
+                                            onNavigateToNoteEditScreen = { noteId ->
+                                                onNavigateToNOteEditScreenWithParam(noteId)
                                             }
                                         )
 

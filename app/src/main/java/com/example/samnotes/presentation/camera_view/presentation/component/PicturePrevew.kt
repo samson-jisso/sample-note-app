@@ -23,13 +23,14 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
+import com.example.samnotes.presentation.camera_view.backend.data.db.PictureEntity
 import com.example.samnotes.presentation.camera_view.logic.CameraViewModel
 import com.example.samnotes.presentation.navigation.Screen
 
 @Composable
 fun PicturePreview(
-    navHostController: NavHostController,
-    viewModel: CameraViewModel
+    onNavCameraToNoteEditScreen: (noteId: Int, photoUri: String) -> Unit,
+    viewModel: CameraViewModel,
 ) {
 
     ConstraintLayout(
@@ -85,14 +86,18 @@ fun PicturePreview(
                     .padding(8.dp)
                     .weight(1f),
                 onClick = {
-                    navHostController.navigate(
-                        Screen.NotesEditScreen.route +
-                                "?noteId=${viewModel.noteId}&photoUri=${viewModel.photoUri.value.toString()}"
-                    ) {
-                        popUpTo(Screen.NotesEditScreen.route) {
-                            inclusive = true
-                        }
+                    viewModel.noteId?.let { noteId ->
+                        onNavCameraToNoteEditScreen(noteId, viewModel.photoUri.value.toString())
                     }
+                    viewModel.insertNotePicture(
+                        viewModel.noteId?.let { noteId ->
+                            PictureEntity(
+                                noteId = noteId,
+                                pictureAddress = viewModel.photoUri.value.toString(),
+                                pictureId = viewModel.randomIdNum()
+                            )
+                        }
+                    )
                 },
                 content = {
                     Icon(

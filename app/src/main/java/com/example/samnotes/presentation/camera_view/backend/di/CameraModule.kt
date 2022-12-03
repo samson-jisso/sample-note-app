@@ -5,7 +5,7 @@ import com.example.samnotes.presentation.camera_view.backend.domain.repository.C
 import com.example.samnotes.presentation.camera_view.backend.domain.repository.CameraRepositoryImp
 import com.example.samnotes.presentation.camera_view.backend.domain.use_cases.CameraUseCases
 import com.example.samnotes.presentation.camera_view.backend.domain.use_cases.GetNotePicture
-import com.example.samnotes.presentation.camera_view.backend.domain.use_cases.InsertNoteWithPicture
+import com.example.samnotes.presentation.camera_view.backend.domain.use_cases.InsertPicture
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,7 +29,7 @@ object CameraModule {
     @Singleton
     fun providesCameraUseCases(repository: CameraRepository): CameraUseCases {
         return CameraUseCases(
-            insertNoteWithPicture = InsertNoteWithPicture(repository),
+            insertPicture = InsertPicture(repository),
             getNotePicture = GetNotePicture(repository)
         )
     }

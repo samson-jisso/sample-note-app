@@ -9,19 +9,23 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.samnotes.presentation.camera_view.backend.data.db.PictureEntity
 import com.example.samnotes.presentation.camera_view.backend.domain.use_cases.CameraUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executor
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
 class CameraViewModel
 @Inject
 constructor(
-    val useCases: CameraUseCases,
+    private val useCases: CameraUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private var _showCamera = mutableStateOf(true)
@@ -35,7 +39,13 @@ constructor(
 
     val noteId:Int? = savedStateHandle.get<Int>("noteId")
 
-
+    fun insertNotePicture(pictureEntity: PictureEntity?) {
+        viewModelScope.launch {
+            useCases.insertPicture(
+                pictureEntity
+            )
+        }
+    }
 
     fun takePhoto(
         outputDirectory: File,
@@ -75,6 +85,9 @@ constructor(
 
     fun showPhotoState() {
         _showPhoto.value = !showPhoto.value
+    }
+   fun randomIdNum(): Int {
+        return Random.nextInt(100000, 999999)
     }
 
     private fun handleImageCapture(uri: Uri) {

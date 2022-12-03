@@ -27,33 +27,39 @@ constructor(
     val state: LiveData<NoteEditScreenState> = _state
 
     var noteId: Int? = savedStateHandle.get<Int>("noteId")
-    private var _photoUri: MutableState<Uri?> =
-        mutableStateOf(savedStateHandle.get<String>("photoUri")?.toUri())
-    val photoUri: State<Uri?> = _photoUri
-
-
-    private var insertTitleState: Long? = null
 
     init {
         if (noteId == -1) {
             // you create a n note id
-            val noteState = NoteEditScreenState(0, "Enter Title", "Enter content")
+            val noteState = NoteEditScreenState(0, "Enter Title", "Enter Content")
             _state.value = noteState
         } else {
 
             //get from db
             viewModelScope.launch(Dispatchers.IO) {
+                println("noteId $noteId")
                 val noteData = noteUseCases.getSingleNote(noteId!!)
                 val noteImage = cameraUseCases.getNotePicture(noteId!!)
-                _photoUri.value = noteImage.pictures[0].pictureAddress.toUri()
-                this.launch(Dispatchers.Main) {
-                    noteId = noteData?.id
-                    _state.value = NoteEditScreenState(
-                        id = noteData?.id,
-                        title = noteData?.title,
-                        content = noteData?.content,
-                        photoUri = noteImage.pictures[0].pictureAddress.toUri()
-                    )
+                if (noteImage.pictures.isNotEmpty()) {
+                    this.launch(Dispatchers.Main) {
+                        println("checkin")
+                        noteId = noteData?.id
+                        _state.value = NoteEditScreenState(
+                            id = noteData?.id,
+                            title = noteData?.title,
+                            content = noteData?.content,
+                            photoUri = noteImage.pictures.first().pictureAddress.toUri()
+                        )
+                    }
+                } else {
+                    this.launch(Dispatchers.Main) {
+                        noteId = noteData?.id
+                        _state.value = NoteEditScreenState(
+                            id = noteData?.id,
+                            title = noteData?.title,
+                            content = noteData?.content,
+                        )
+                    }
                 }
             }
         }
@@ -63,6 +69,34 @@ constructor(
         noteEvent: NoteEvent
     ) = viewModelScope.launch {
         when (noteEvent) {
+            is NoteEvent.ClearTitleHint -> {
+                if (noteId == -1 || state.value?.title == "Enter Title") {
+                    _state.value = state.value?.copy(
+                        title = ""
+                    )
+                }
+            }
+            is NoteEvent.ClearContentHint -> {
+                if (noteId == -1 || state.value?.content == "Enter Content") {
+                    _state.value = state.value?.copy(
+                        content = ""
+                    )
+                }
+            }
+            is NoteEvent.TitleFocusChanged -> {
+                if (state.value?.title == "") {
+                    _state.value = state.value?.copy(
+                        title = "Enter Title"
+                    )
+                }
+            }
+            is NoteEvent.ContentFocusChanged -> {
+                if (state.value?.content == "") {
+                    _state.value = state.value?.copy(
+                        content = "Enter Content"
+                    )
+                }
+            }
             is NoteEvent.UpdateNoteTitle -> {
                 _state.value = state.value?.copy(
                     title = noteEvent.titleEntered
@@ -113,14 +147,13 @@ constructor(
     }
 
     private fun insertNote(id: Int?, title: String?, content: String?) = viewModelScope.launch {
-        val rowId = noteUseCases.insertNote(
+        noteUseCases.insertNote(
             Note(
                 id = id,
                 title = title,
                 content = content
             )
         )
-        insertTitleState = rowId
     }
 
     private fun randomIdNum(): Int {

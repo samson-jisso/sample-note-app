@@ -1,7 +1,6 @@
 package com.example.samnotes.presentation.note_edit_screen
 
 import android.Manifest
-import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -12,37 +11,29 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
-import com.example.samnotes.presentation.navigation.Screen
 import com.example.samnotes.presentation.note_edit_screen.component.NoteTextHolderComponent
 import com.example.samnotes.presentation.note_edit_screen.component.TopBar
 
 @Composable
 fun NoteEditScreen(
-    navHostController: NavHostController,
+    onNavigateToCamera: (Int) -> Unit,
+    onNavigateToNoteScreen: () -> Unit,
     viewModel: NoteEditScreenViewModel = hiltViewModel()
 ) {
-
-//    val context = LocalContext.current
     val padding = 8.dp
     val state = viewModel.state.observeAsState()
-    val photoUri: Uri? = viewModel.photoUri.value
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            navHostController.navigate(
-                Screen.CameraView.route + "?noteId=${viewModel.noteId}"
-            ){
-                popUpTo(Screen.CameraView.route){
-                    inclusive = true
-                }
+            viewModel.noteId?.let { noteId ->
+                onNavigateToCamera(noteId)
             }
         }
     }
@@ -50,6 +41,7 @@ fun NoteEditScreen(
     Surface(
         color = MaterialTheme.colors.background
     ) {
+
         ConstraintLayout(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -64,7 +56,9 @@ fun NoteEditScreen(
                 onClickCameraIcon = {
                     permissionLauncher.launch(Manifest.permission.CAMERA)
                 },
-                navHostController = navHostController
+                onNavNoteScreen = {
+                    onNavigateToNoteScreen()
+                }
             )
 
             NoteTextHolderComponent(
@@ -80,10 +74,17 @@ fun NoteEditScreen(
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                     }
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            viewModel.handleNoteEvent(NoteEvent.ClearTitleHint)
+                        } else {
+                            viewModel.handleNoteEvent(NoteEvent.TitleFocusChanged)
+                        }
+                    }
             )
-            if (photoUri != null) {
+            if (state.value?.photoUri != null) {
                 Image(
-                    painter = rememberImagePainter(data = photoUri),
+                    painter = rememberImagePainter(data = state.value?.photoUri),
                     contentDescription = "imageCaptured",
                     modifier = Modifier
                         .constrainAs(image) {
@@ -106,13 +107,20 @@ fun NoteEditScreen(
                     .wrapContentHeight()
                     .fillMaxWidth()
                     .constrainAs(content) {
-                        if (photoUri != null) {
+                        if (state.value?.photoUri != null) {
                             top.linkTo(image.bottom)
                         } else {
                             top.linkTo(title.bottom)
                         }
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
+                    }
+                    .onFocusChanged {
+                        if (it.isFocused) {
+                            viewModel.handleNoteEvent(NoteEvent.ClearContentHint)
+                        } else {
+                            viewModel.handleNoteEvent(NoteEvent.ContentFocusChanged)
+                        }
                     }
             )
         }
