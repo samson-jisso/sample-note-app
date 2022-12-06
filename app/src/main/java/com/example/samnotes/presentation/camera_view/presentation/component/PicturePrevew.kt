@@ -1,8 +1,6 @@
 package com.example.samnotes.presentation.camera_view.presentation.component
 
-import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -13,23 +11,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.example.samnotes.presentation.camera_view.backend.data.db.PictureEntity
 import com.example.samnotes.presentation.camera_view.logic.CameraViewModel
-import com.example.samnotes.presentation.navigation.Screen
 
 @Composable
 fun PicturePreview(
-    onNavCameraToNoteEditScreen: (noteId: Int, photoUri: String) -> Unit,
+    onNavCameraToNoteEditScreen: (noteId: Int) -> Unit,
     viewModel: CameraViewModel,
 ) {
 
@@ -87,12 +80,12 @@ fun PicturePreview(
                     .weight(1f),
                 onClick = {
                     viewModel.noteId?.let { noteId ->
-                        onNavCameraToNoteEditScreen(noteId, viewModel.photoUri.value.toString())
+                        onNavCameraToNoteEditScreen(noteId)
                     }
                     viewModel.insertNotePicture(
                         viewModel.noteId?.let { noteId ->
                             PictureEntity(
-                                noteId = noteId,
+                                noteOwnerId = noteId,
                                 pictureAddress = viewModel.photoUri.value.toString(),
                                 pictureId = viewModel.randomIdNum()
                             )

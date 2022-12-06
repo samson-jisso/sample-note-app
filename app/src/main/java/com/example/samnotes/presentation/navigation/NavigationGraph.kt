@@ -24,15 +24,17 @@ fun NavigationGraph(
         ) {
             NotesScreen(
                 onNavigateToNOteEditScreenWithParam = { noteId ->
-                    navController.navigate(
-                        Screen.NotesEditScreen.route + "?noteId=$noteId"
-                    )
-                },
-                onNavigateToNoteEditScreenWithoutParam = {
-                    navController.navigate(
-                        Screen.NotesEditScreen.route
-                    )
+                    if (noteId != null) {
+                        navController.navigate(
+                            Screen.NotesEditScreen.route + "?noteId=$noteId"
+                        )
+                    } else {
+                        navController.navigate(
+                            Screen.NotesEditScreen.route
+                        )
+                    }
                 }
+
             )
         }
         composable(
@@ -56,9 +58,7 @@ fun NavigationGraph(
                 onNavigateToCamera = { noteId ->
                     navController.navigate(
                         Screen.CameraView.route + "?noteId=$noteId"
-                    ) {
-                        popUpTo(Screen.CameraView.route)
-                    }
+                    )
                 },
                 onNavigateToNoteScreen = {
                     navController.navigate(
@@ -79,10 +79,10 @@ fun NavigationGraph(
             )
         ) {
             CameraView(
-                onNavCameraToNoteEditScreen = { noteId, photoUri ->
+                onNavCameraToNoteEditScreen = { noteId ->
                     navController.navigate(
                         Screen.NotesEditScreen.route +
-                                "?noteId=${noteId}&photoUri=${photoUri}"
+                                "?noteId=${noteId}"
                     ) {
                         popUpTo(Screen.CameraView.route) {
                             inclusive = true

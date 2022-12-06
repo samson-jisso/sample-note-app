@@ -17,8 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
-import com.example.samnotes.presentation.navigation.Screen
 import com.example.samnotes.presentation.note_edit_screen.component.SelectionModeItems
 import com.example.samnotes.presentation.note_screen.component.NoteItem
 import com.example.samnotes.presentation.note_screen.component.SelectItemIcon
@@ -26,8 +24,7 @@ import com.example.samnotes.presentation.note_screen.component.SelectItemIcon
 @Composable
 fun NotesScreen(
     viewModel: NoteScreenViewModel = hiltViewModel(),
-    onNavigateToNOteEditScreenWithParam:(Int) -> Unit,
-    onNavigateToNoteEditScreenWithoutParam: () -> Unit
+    onNavigateToNOteEditScreenWithParam:(Int?) -> Unit,
 ) {
 
     LaunchedEffect(
@@ -59,7 +56,7 @@ fun NotesScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    onNavigateToNoteEditScreenWithoutParam()
+                    onNavigateToNOteEditScreenWithParam(null)
                 }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Note")
             }
@@ -90,7 +87,7 @@ fun NotesScreen(
                          start = 12.dp, top = 16.dp, end = 12.dp, bottom = 16.dp
                      ),*/ content = {
                         items(items = noteScreenState?.data ?: listOf()) { item ->
-                            if (item.id != null) {
+                            if (item.noteId != null) {
 //                                println(item.id)
                                 Box(
                                     modifier = Modifier
@@ -104,7 +101,7 @@ fun NotesScreen(
                                                 .background(Color.Red),
                                             title = item.title?.take(20),
                                             content = item.content?.take(40),
-                                            id = item.id,
+                                            id = item.noteId,
                                             viewModel = viewModel,
                                             click = { noteId ->
                                                 println("noteId $noteId")
@@ -130,7 +127,7 @@ fun NotesScreen(
                                             }
                                         )
 
-                                        if (noteScreenState?.selectedNoteId?.contains(item.id)!!) {
+                                        if (noteScreenState?.selectedNoteId?.contains(item.noteId)!!) {
                                             SelectItemIcon(
                                                 modifier = Modifier
                                                     .align(Alignment.TopEnd)

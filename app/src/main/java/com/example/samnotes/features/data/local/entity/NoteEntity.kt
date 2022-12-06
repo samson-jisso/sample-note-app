@@ -12,7 +12,7 @@ data class NoteEntity(
     val content: String? = null,
 ) {
     fun toNoteDomain(): Note = Note(
-        id = noteId,
+        noteId = noteId,
         title = title,
         content = content,
     )

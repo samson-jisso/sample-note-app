@@ -8,7 +8,7 @@ data class  NoteWithPictures(
     @Embedded val note: NoteEntity,
     @Relation(
         parentColumn = "noteId",
-        entityColumn = "noteId"
+        entityColumn = "noteOwnerId"
     )
     val pictures: List<PictureEntity>
 )

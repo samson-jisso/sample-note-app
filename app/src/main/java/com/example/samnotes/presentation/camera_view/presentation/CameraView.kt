@@ -17,7 +17,7 @@ import java.util.concurrent.Executors
 
 @Composable
 fun CameraView(
-    onNavCameraToNoteEditScreen:(noteId:Int, photoUri:String) -> Unit,
+    onNavCameraToNoteEditScreen:(noteId:Int) -> Unit,
     outPutDirectory: File,
     executor:Executor,
     onError: (ImageCaptureException) -> Unit,

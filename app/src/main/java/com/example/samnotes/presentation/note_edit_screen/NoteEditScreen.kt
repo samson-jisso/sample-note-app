@@ -73,6 +73,7 @@ fun NoteEditScreen(
                         top.linkTo(topBar.bottom)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
+
                     }
                     .onFocusChanged {
                         if (it.isFocused) {
