@@ -6,6 +6,8 @@ data class NoteEditScreenState(
     val id: Int?,
     val title: String?,
     val content: String?,
-    val photoUri: Uri? = null
+    val photoUri: Uri? = null,
+    val fileUriImage: Uri? = null,
+    var showFileUriImage: Boolean = false,
 )
 

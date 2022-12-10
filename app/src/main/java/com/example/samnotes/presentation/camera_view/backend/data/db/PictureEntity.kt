@@ -19,5 +19,7 @@ data class PictureEntity(
     @PrimaryKey(autoGenerate = false)
     val pictureId: Int,
     val pictureAddress: String,
-    val noteOwnerId: Int
+    val noteOwnerId: Int,
+    val offsetX: String? = "0",
+    val offsetY: String? = "0"
 )

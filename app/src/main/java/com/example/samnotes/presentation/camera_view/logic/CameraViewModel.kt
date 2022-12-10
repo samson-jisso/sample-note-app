@@ -1,6 +1,9 @@
 package com.example.samnotes.presentation.camera_view.logic
 
+import android.content.ContentValues
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -12,14 +15,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.samnotes.presentation.camera_view.backend.data.db.PictureEntity
 import com.example.samnotes.presentation.camera_view.backend.domain.use_cases.CameraUseCases
+import com.example.samnotes.presentation.camera_view.presentation.CameraEvent
+import com.example.samnotes.presentation.randomIdNum
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 import java.util.concurrent.Executor
 import javax.inject.Inject
-import kotlin.random.Random
 
 @HiltViewModel
 class CameraViewModel
@@ -35,36 +37,72 @@ constructor(
     val showPhoto: State<Boolean> = _showPhoto
 
     private var _photoUri: MutableState<Uri?> = mutableStateOf(null)
-    val photoUri:State<Uri?> = _photoUri
+    val photoUri: State<Uri?> = _photoUri
 
-    val noteId:Int? = savedStateHandle.get<Int>("noteId")
+    val noteId: Int? = savedStateHandle.get<Int>("noteId")
+    var randomPictureId: Int? = null
 
-    fun insertNotePicture(pictureEntity: PictureEntity?) {
-        viewModelScope.launch {
-            useCases.insertPicture(
-                pictureEntity
-            )
+    fun handleEvent(event: CameraEvent) {
+        when (event) {
+            is CameraEvent.OnSave -> {
+                randomPictureId = randomIdNum()
+                viewModelScope.launch {
+                    useCases.insertPicture(
+                        noteId?.let { noteId ->
+                            PictureEntity(
+                                noteOwnerId = noteId,
+                                pictureAddress = photoUri.value.toString(),
+                                pictureId = randomPictureId!!
+                            )
+                        }
+                    )
+                }
+            }
+            is CameraEvent.OnUpdate -> {
+
+                viewModelScope.launch(Dispatchers.IO) {
+                    randomPictureId = useCases.getPictureId(
+                        event.pictureAddress
+                    )
+
+                    useCases.updateNotePicture(
+                        noteId?.let { noteId ->
+                            PictureEntity(
+                                pictureId =randomPictureId!!,
+                                pictureAddress = event.pictureAddress,
+                                noteOwnerId = noteId,
+                                offsetX = event.offsetX.toString(),
+                                offsetY = event.offsetY.toString()
+                            )
+                        }
+
+                    )
+                }
+            }
+
         }
     }
 
+    fun getContentValues(photoName: String): ContentValues {
+        return ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, photoName)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/ComposeImages")
+            }
+        }
+    }
+
+
     fun takePhoto(
-        outputDirectory: File,
+        outputDirectory: ImageCapture.OutputFileOptions,
         imageCapture: ImageCapture?,
         executor: Executor,
         onError: (ImageCaptureException) -> Unit
     ) {
-        val photoFileName = File(
-            outputDirectory,
-            SimpleDateFormat(
-                "yyyy-MM-dd-HH-mm-ss-SSS",
-                Locale.US
-            ).format(System.currentTimeMillis()) + ".jpg"
-        )
-
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFileName).build()
 
         imageCapture!!.takePicture(
-            outputOptions,
+            outputDirectory,
             executor,
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exception: ImageCaptureException) {
@@ -73,7 +111,7 @@ constructor(
                 }
 
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val savedUri = Uri.fromFile(photoFileName)
+                    val savedUri = outputFileResults.savedUri
                     handleImageCapture(savedUri)
                 }
             })
@@ -86,11 +124,8 @@ constructor(
     fun showPhotoState() {
         _showPhoto.value = !showPhoto.value
     }
-   fun randomIdNum(): Int {
-        return Random.nextInt(100000, 999999)
-    }
 
-    private fun handleImageCapture(uri: Uri) {
+    private fun handleImageCapture(uri: Uri?) {
         _photoUri.value = uri
         _showCamera.value = false
         _showPhoto.value = true

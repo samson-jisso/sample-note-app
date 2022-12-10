@@ -15,4 +15,12 @@ class CameraRepositoryImp(
         return pictureDao.getNotePicture(noteId)
     }
 
+    override suspend fun updateNotePicture(picturesEntity: PictureEntity?) {
+        pictureDao.updateNotePicture(picturesEntity)
+    }
+
+    override suspend fun getPictureId(pictureAddress: String?): Int {
+        return pictureDao.getPictureId(pictureAddress)
+    }
+
 }

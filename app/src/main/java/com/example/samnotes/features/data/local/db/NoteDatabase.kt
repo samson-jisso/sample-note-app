@@ -8,7 +8,7 @@ import com.example.samnotes.presentation.camera_view.backend.data.db.PictureEnti
 
 @Database(
     entities = [NoteEntity::class, PictureEntity::class],
-    version = 2,
+    version = 4,
     exportSchema = false
 )
 abstract class NoteDatabase:RoomDatabase() {

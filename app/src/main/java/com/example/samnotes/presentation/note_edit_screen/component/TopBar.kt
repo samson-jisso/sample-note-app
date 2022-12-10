@@ -1,21 +1,26 @@
 package com.example.samnotes.presentation.note_edit_screen.component
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
 
 @Composable
 fun TopBar(
     onNavNoteScreen:() -> Unit,
     modifier: Modifier,
-    onClickCameraIcon: () -> Unit
+    onClickCameraIcon: () -> Unit,
+    onFileAddClicked: () -> Unit
 ) {
     Box(modifier = modifier
         .fillMaxWidth()
@@ -39,25 +44,27 @@ fun TopBar(
         Row(
             modifier = Modifier.align(Alignment.TopEnd)
         ) {
-
+        //add file button
             Card(
                 modifier = modifier
             ) {
                 IconButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { onFileAddClicked() },
                     content = {
                     Icon(
-                        imageVector = Icons.Default.Search,
+                        imageVector = Icons.Default.Link,
                         contentDescription = "Search",
                         tint = MaterialTheme.colors.primary
                     )
                 })
 
             }
+            //AddPhoto button
             Card(
                 modifier = modifier
             ) {
-                IconButton(onClick = {
+                IconButton(
+                    onClick = {
                     onClickCameraIcon()
                 }, content = {
                     Icon(

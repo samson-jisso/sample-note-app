@@ -5,8 +5,8 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -33,7 +33,6 @@ fun NoteItem(
         Card(
             backgroundColor = MaterialTheme.colors.onBackground,
             modifier = modifier
-                .background(Color.Green)
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onTap = {
@@ -64,11 +63,11 @@ fun NoteItem(
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
             color = MaterialTheme.colors.primary,
-            textAlign = TextAlign.Left,
+            textAlign = TextAlign.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 8.dp)
+                .align(Alignment.CenterHorizontally)
+                .padding(start = 8.dp),
         )
-        Spacer(modifier = Modifier.padding(8.dp))
     }
 }

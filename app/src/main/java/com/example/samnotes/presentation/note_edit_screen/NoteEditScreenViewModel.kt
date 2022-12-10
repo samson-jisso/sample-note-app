@@ -1,16 +1,18 @@
 package com.example.samnotes.presentation.note_edit_screen
 
-import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.example.samnotes.features.domain.model.Note
 import com.example.samnotes.features.domain.use_case.NoteUseCases
 import com.example.samnotes.presentation.camera_view.backend.domain.use_cases.CameraUseCases
+import com.example.samnotes.presentation.getUriFileName
+import com.example.samnotes.presentation.imageExtensionsArray
+import com.example.samnotes.presentation.randomIdNum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.random.Random
 
 @HiltViewModel
 class NoteEditScreenViewModel
@@ -23,6 +25,8 @@ constructor(
     private var _state = MutableLiveData<NoteEditScreenState>()
     val state: LiveData<NoteEditScreenState> = _state
     var noteId: Int? = savedStateHandle.get<Int>("noteId")
+    var offsetX = mutableStateOf(0f)
+    var offsetY = mutableStateOf(0f)
     private val enterTitle = "Enter Title"
     private val enterContent = "Enter Content"
 
@@ -43,8 +47,10 @@ constructor(
                             id = noteImage.note.noteId,
                             title = noteImage.note.title,
                             content = noteImage.note.content,
-                            photoUri = noteImage.pictures.first().pictureAddress.toUri()
+                            photoUri = noteImage.pictures.first().pictureAddress.toUri(),
                         )
+                        offsetY.value = noteImage.pictures.first().offsetY?.toFloat()!!
+                        offsetX.value = noteImage.pictures.first().offsetX?.toFloat()!!
                     }
                 } else {
                     val noteData = noteUseCases.getSingleNote(noteId!!)
@@ -54,6 +60,7 @@ constructor(
                             id = noteData?.noteId,
                             title = noteData?.title,
                             content = noteData?.content,
+
                         )
                     }
                 }
@@ -62,10 +69,19 @@ constructor(
     }
 
     fun handleNoteEvent(
-        noteEvent: NoteEvent
+        noteEvent: NoteEditScreenEvent
     ) = viewModelScope.launch {
         when (noteEvent) {
-            is NoteEvent.ClearTitleHint -> {
+            is NoteEditScreenEvent.ShowUriImage -> {
+                val uriDataType = getUriFileName(noteEvent.uri, noteEvent.context)
+                if (imageExtensionsArray.contains(uriDataType?.takeLast(3))) {
+                    _state.value = state.value?.copy(
+                        showFileUriImage = true,
+                        fileUriImage = noteEvent.uri
+                    )
+                }
+            }
+            is NoteEditScreenEvent.ClearTitleHint -> {
 
                 if (noteId == -1 || state.value?.title == enterTitle) {
                     _state.value = state.value?.copy(
@@ -73,45 +89,45 @@ constructor(
                     )
                 }
             }
-            is NoteEvent.ClearContentHint -> {
+            is NoteEditScreenEvent.ClearContentHint -> {
                 if (noteId == -1 || state.value?.content == enterContent) {
                     _state.value = state.value?.copy(
                         content = ""
                     )
                 }
             }
-            is NoteEvent.TitleFocusChanged -> {
+            is NoteEditScreenEvent.TitleFocusChanged -> {
                 if (state.value?.title == "") {
                     _state.value = state.value?.copy(
                         title = enterTitle
                     )
                 }
             }
-            is NoteEvent.ContentFocusChanged -> {
+            is NoteEditScreenEvent.ContentFocusChanged -> {
                 if (state.value?.content == "") {
                     _state.value = state.value?.copy(
                         content = enterContent
                     )
                 }
             }
-            is NoteEvent.UpdateNoteTitle -> {
+            is NoteEditScreenEvent.UpdateNoteTitleEditScreen -> {
                 _state.value = state.value?.copy(
                     title = noteEvent.titleEntered
                 )
-                checkUpdate()
+                updateNote()
             }
-            is NoteEvent.UpdateNoteContent -> {
+            is NoteEditScreenEvent.UpdateNoteContentEditScreen -> {
                 _state.value = state.value?.copy(
                     content = noteEvent.contentEntered
                 )
-                checkUpdate()
+                updateNote()
             }
 
         }
 
     }
 
-    private suspend fun checkUpdate() {
+    private suspend fun updateNote() {
         if (
             noteId == -1
             && state.value!!.title!!.isNotBlank()
@@ -141,12 +157,4 @@ constructor(
         )
     }
 
-    private fun randomIdNum(): Int? {
-        return try {
-            Random.nextInt(100000, 9999999)
-        } catch (e: Exception) {
-            Log.e("randomIdNum", "randomIdError: $e", e)
-            null
-        }
-    }
 }

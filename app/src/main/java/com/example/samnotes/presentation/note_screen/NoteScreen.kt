@@ -1,7 +1,6 @@
 package com.example.samnotes.presentation.note_screen
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -9,11 +8,12 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,7 +24,7 @@ import com.example.samnotes.presentation.note_screen.component.SelectItemIcon
 @Composable
 fun NotesScreen(
     viewModel: NoteScreenViewModel = hiltViewModel(),
-    onNavigateToNOteEditScreenWithParam:(Int?) -> Unit,
+    onNavigateToNoteEditScreen:(Int?) -> Unit,
 ) {
 
     LaunchedEffect(
@@ -56,7 +56,7 @@ fun NotesScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    onNavigateToNOteEditScreenWithParam(null)
+                    onNavigateToNoteEditScreen(null)
                 }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Note")
             }
@@ -88,7 +88,6 @@ fun NotesScreen(
                      ),*/ content = {
                         items(items = noteScreenState?.data ?: listOf()) { item ->
                             if (item.noteId != null) {
-//                                println(item.id)
                                 Box(
                                     modifier = Modifier
                                         .padding(end = 4.dp, start = 4.dp, bottom = 8.dp),
@@ -97,15 +96,12 @@ fun NotesScreen(
                                             modifier = Modifier
                                                 .fillMaxWidth(1f)
                                                 .height(100.dp)
-                                                .padding(8.dp)
-                                                .background(Color.Red),
+                                                .padding(8.dp),
                                             title = item.title?.take(20),
                                             content = item.content?.take(40),
                                             id = item.noteId,
                                             viewModel = viewModel,
                                             click = { noteId ->
-                                                println("noteId $noteId")
-                                                println("selectedNotes: ${noteScreenState?.selectedNoteId}")
                                                 viewModel.noteScreenEvent(
                                                     NoteScreenEvent.SelectOrDeselectNote(
                                                         noteId
@@ -123,7 +119,7 @@ fun NotesScreen(
                                                 )
                                             },
                                             onNavigateToNoteEditScreen = { noteId ->
-                                                onNavigateToNOteEditScreenWithParam(noteId)
+                                                onNavigateToNoteEditScreen(noteId)
                                             }
                                         )
 

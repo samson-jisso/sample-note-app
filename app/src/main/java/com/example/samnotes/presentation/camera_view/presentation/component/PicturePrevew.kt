@@ -16,9 +16,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
 import com.example.samnotes.presentation.camera_view.backend.data.db.PictureEntity
 import com.example.samnotes.presentation.camera_view.logic.CameraViewModel
+import com.example.samnotes.presentation.camera_view.presentation.CameraEvent
 
 @Composable
 fun PicturePreview(
@@ -33,7 +35,7 @@ fun PicturePreview(
     ) {
         val (image, row) = createRefs()
         Image(
-            painter = rememberImagePainter(data = viewModel.photoUri.value),
+            painter = rememberAsyncImagePainter(model = viewModel.photoUri.value),
             contentDescription = "captured image",
             modifier = Modifier
                 .constrainAs(image) {
@@ -82,15 +84,7 @@ fun PicturePreview(
                     viewModel.noteId?.let { noteId ->
                         onNavCameraToNoteEditScreen(noteId)
                     }
-                    viewModel.insertNotePicture(
-                        viewModel.noteId?.let { noteId ->
-                            PictureEntity(
-                                noteOwnerId = noteId,
-                                pictureAddress = viewModel.photoUri.value.toString(),
-                                pictureId = viewModel.randomIdNum()
-                            )
-                        }
-                    )
+                    viewModel.handleEvent(CameraEvent.OnSave)
                 },
                 content = {
                     Icon(

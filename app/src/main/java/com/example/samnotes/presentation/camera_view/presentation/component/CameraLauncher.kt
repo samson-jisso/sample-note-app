@@ -1,5 +1,6 @@
 package com.example.samnotes.presentation.camera_view.presentation.component
 
+import android.provider.MediaStore
 import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -19,30 +20,34 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.samnotes.presentation.getCurrentDate
 import com.example.samnotes.presentation.camera_view.logic.CameraViewModel
-import java.io.File
-import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 var imageCapture: ImageCapture? = null
 
 @Composable
 fun CameraLauncher(
-    outPutDirectory: File,
-    executor: Executor,
     onError: (ImageCaptureException) -> Unit,
     viewModel: CameraViewModel
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val lensFacing = CameraSelector.LENS_FACING_BACK
     val context = LocalContext.current
+    val executor = Executors.newSingleThreadExecutor()
+
+    val outputFileOptions =
+        ImageCapture.OutputFileOptions.Builder(
+            context.contentResolver,
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            viewModel.getContentValues(getCurrentDate())
+        ).build()
 
     val previewView = remember { PreviewView(context) }
     LaunchedEffect(lensFacing) {
@@ -85,7 +90,7 @@ fun CameraLauncher(
             modifier = Modifier.padding(bottom = 20.dp),
             onClick = {
                 viewModel.takePhoto(
-                    outputDirectory = outPutDirectory,
+                    outputDirectory = outputFileOptions,
                     imageCapture = imageCapture,
                     executor = executor,
                     onError = onError,

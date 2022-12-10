@@ -9,21 +9,17 @@ import androidx.navigation.compose.rememberNavController
 import com.example.samnotes.presentation.camera_view.presentation.CameraView
 import com.example.samnotes.presentation.note_edit_screen.NoteEditScreen
 import com.example.samnotes.presentation.note_screen.NotesScreen
-import java.io.File
-import java.util.concurrent.Executor
 
 @Composable
 fun NavigationGraph(
     navController: NavHostController = rememberNavController(),
-    outPutDirectory: File,
-    executor: Executor,
 ) {
     NavHost(navController = navController, startDestination = Screen.NotesScreen.route) {
         composable(
             route = Screen.NotesScreen.route
         ) {
             NotesScreen(
-                onNavigateToNOteEditScreenWithParam = { noteId ->
+                onNavigateToNoteEditScreen = { noteId ->
                     if (noteId != null) {
                         navController.navigate(
                             Screen.NotesEditScreen.route + "?noteId=$noteId"
@@ -89,8 +85,6 @@ fun NavigationGraph(
                         }
                     }
                 },
-                outPutDirectory = outPutDirectory,
-                executor = executor,
                 onError = { imageCaptureException ->
                     Log.e("sam", "CameraViewError", imageCaptureException)
                 })
