@@ -20,7 +20,6 @@ class MainActivity : ComponentActivity() {
     private val permissions = listOf(
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
         Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.MANAGE_EXTERNAL_STORAGE
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,17 +30,20 @@ class MainActivity : ComponentActivity() {
             val result = multiplePermissionsState.permissions.all { permissionState ->
                 permissionState.status == PermissionStatus.Granted
             }
+            if (result) {
+                Toast.makeText(this, "tnx", Toast.LENGTH_SHORT).show()
+            }
             SamNotesTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     color = MaterialTheme.colors.primary
                 ) {
-                    if (result) {
-                        Toast.makeText(this, "tnx", Toast.LENGTH_SHORT).show()
-                    } else {
-                        multiplePermissionsState.launchMultiplePermissionRequest()
-                    }
-                    NavigationGraph()
+                    NavigationGraph(
+                        onRequestPermission = {
+                            multiplePermissionsState.launchMultiplePermissionRequest()
+                        }
+                    )
+
                 }
             }
         }

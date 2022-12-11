@@ -13,6 +13,7 @@ import com.example.samnotes.presentation.note_screen.NotesScreen
 @Composable
 fun NavigationGraph(
     navController: NavHostController = rememberNavController(),
+    onRequestPermission: () -> Unit
 ) {
     NavHost(navController = navController, startDestination = Screen.NotesScreen.route) {
         composable(
@@ -20,6 +21,7 @@ fun NavigationGraph(
         ) {
             NotesScreen(
                 onNavigateToNoteEditScreen = { noteId ->
+                    onRequestPermission()
                     if (noteId != null) {
                         navController.navigate(
                             Screen.NotesEditScreen.route + "?noteId=$noteId"
