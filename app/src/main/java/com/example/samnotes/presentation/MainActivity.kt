@@ -32,12 +32,10 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 @AndroidEntryPoint
-@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalPermissionsApi::class)
 class MainActivity : ComponentActivity() {
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
-    private lateinit var photoUri: Uri
     private var shouldShowPhoto: MutableState<Boolean> = mutableStateOf(false)
 
     private var shouldShowCamera: MutableState<Boolean> = mutableStateOf(false)
@@ -84,25 +82,34 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(
-                            route = Screen.NoteEditScreen.route + "?noteId={noteId}",
+                            route = Screen.NoteEditScreen.route + "?noteId={noteId}&photoUri={photoUri}",
                             arguments = listOf(navArgument(
                                 name = "noteId"
                             ) {
                                 type = NavType.IntType
                                 defaultValue = -1
-                            })
-                        ) {
-                            NoteEditScreen(
-                                navController = navController,
-                            )
-                        }
+                            },
+                                navArgument(
+                                    name = "photoUri"
+                                ) {
+                                    type = NavType.StringType
+                                    defaultValue = null
+                                    nullable = true
+                                }
+                        )
+                        ) { arg ->
+                        NoteEditScreen(
+                            arg = arg.arguments?.getString("photoUri"),
+                            navController = navController,
+                        )
+                    }
                         composable(
                             route = Screen.CameraView.route,
                         ) {
                             CameraView(
+                                navController = navController,
                                 outputDirectory = outputDirectory,
                                 executor = cameraExecutor,
-                                onImageCaptured = ::handleImageCapture,
                                 onError = { Log.e("sam", "ViewError", it) }
                             )
                         }
@@ -113,10 +120,7 @@ class MainActivity : ComponentActivity() {
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
-    private fun handleImageCapture(uri: Uri) {
-        Log.i("samcj", "Image captured: $uri")
-        photoUri = uri
-    }
+
 
     private fun getOutputDirectory(): File {
         val mediaDir = externalMediaDirs.firstOrNull()?.let {
@@ -129,8 +133,5 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
-    }
-    companion object {
-        const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
 }

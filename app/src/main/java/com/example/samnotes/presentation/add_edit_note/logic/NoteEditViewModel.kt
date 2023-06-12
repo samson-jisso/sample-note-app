@@ -1,5 +1,7 @@
 package com.example.samnotes.presentation.add_edit_note.logic
 
+import android.net.Uri
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -21,11 +23,15 @@ class NoteEditViewModel @Inject constructor(
     private val _noteTitle = mutableStateOf(NoteEditState(hint = "Enter Title"))
     val noteTitle: State<NoteEditState> = _noteTitle
 
+    var photoUri = mutableStateOf(NoteEditState())
+
     private val _noteContent = mutableStateOf(NoteEditState(hint = "Enter your note Content"))
     val noteContent: State<NoteEditState> = _noteContent
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
+
+
 
     private var currentNoteId: Int? = null
 
@@ -36,6 +42,8 @@ class NoteEditViewModel @Inject constructor(
                 viewModelScope.launch {
                     noteUseCases.getNoteById(noteId)?.also { note ->
                         currentNoteId = note.id
+
+                        photoUri.value.photoUri = note.photoUri
                         _noteTitle.value = noteTitle.value.copy(
                             text = note.title,
                             isHintVisible = false
@@ -80,7 +88,8 @@ class NoteEditViewModel @Inject constructor(
                             Note(
                                 title = noteTitle.value.text,
                                 content = noteContent.value.text,
-                                id = currentNoteId
+                                id = currentNoteId,
+                                photoUri = photoUri.value.photoUri
                             )
                         )
                         _eventFlow.emit(UiEvent.SaveNote)
